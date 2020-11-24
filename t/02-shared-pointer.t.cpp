@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <sql_memory.h>
+#include <memory/smart_pointer.h>
 
 using namespace sql;
 

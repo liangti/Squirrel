@@ -7,7 +7,8 @@ configure_file(
 
 foreach(
     TEST
-    01-shared-ptr
+    01-memory-allocator
+    02-shared-pointer
 )
     add_executable(${TEST}.t ${TEST}.t.cpp)
     target_include_directories(
