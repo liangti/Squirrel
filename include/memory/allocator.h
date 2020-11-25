@@ -42,6 +42,8 @@ Block *split_block(Block*,size_t);
 
 Block* coalesce_block(Block *);
 
+void reset(char*);
+
 }; // namespace sql
 
 #endif

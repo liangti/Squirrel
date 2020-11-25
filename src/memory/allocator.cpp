@@ -11,6 +11,12 @@ Block *heap_top = heap_start;
 
 }; // anonymous namespace
 
+// reset heap
+void reset(char* begin){
+    char* top = (char *)sbrk(0);
+    sbrk(begin - top);
+}
+
 /*
 Memory Align:
 - x64
@@ -43,6 +49,7 @@ word_t *alloc(size_t size){
     size = align(size);
 
     if(auto block = find_free_block(size)){
+        block->used = true;
         return block->data;
     }
 
