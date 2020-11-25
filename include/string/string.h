@@ -3,6 +3,9 @@
 
 namespace sql{
 
+void _strcpy(char*, const char*);
+unsigned int _strlen(const char*);
+
 class String{
 public:
     String(const char*);
