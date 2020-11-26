@@ -58,3 +58,12 @@ TEST(test_string_basic, move_self_assignment){
     s = std::move(s);
     ASSERT_STREQ(s.c_str(), "abc");
 }
+
+TEST(test_string_basic, string_concatenation){
+    String a("abc");
+    String b("def");
+    String c = a + b;
+    ASSERT_STREQ(a.c_str(), "abc");
+    ASSERT_STREQ(b.c_str(), "def");
+    ASSERT_STREQ(c.c_str(), "abcdef");
+}

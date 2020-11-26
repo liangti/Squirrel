@@ -73,4 +73,23 @@ String &String::operator=(String&& other){
     return *this;
 }
 
+String String::operator+(const String& other){
+    char *temp = new char[_strlen(s_data) + _strlen(other.s_data) + 1];
+    char *ptr = s_data;
+    char *ptr_temp = temp;
+    while(*ptr != '\0'){
+        *ptr_temp = *ptr;
+        ptr_temp++;
+        ptr++;
+    }
+    ptr = other.s_data;
+    while(*ptr != '\0'){
+        *ptr_temp = *ptr;
+        ptr_temp++;
+        ptr++;
+    }
+    return String(temp);
+
+}
+
 };

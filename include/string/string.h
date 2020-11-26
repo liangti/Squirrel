@@ -14,6 +14,7 @@ public:
     String(String&&);
     String& operator=(const String&);
     String& operator=(String&&);
+    String operator+(const String&);
     const char* c_str();
 private:
     char *s_data;
