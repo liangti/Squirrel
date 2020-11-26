@@ -20,7 +20,7 @@ unsigned int _strlen(const char* input){
     return count;
 }
 
-char *String::c_str(){
+const char *String::c_str(){
     return s_data;
 }
 
