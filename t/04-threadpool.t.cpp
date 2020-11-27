@@ -3,6 +3,8 @@
 
 using namespace sql;
 
+static const int MAX_LOOP_NUM = 10;
+
 class ThreadPoolTest: public ::testing::TestWithParam<int> {};
 
 TEST_P(ThreadPoolTest, no_task){
@@ -20,4 +22,16 @@ TEST_P(ThreadPoolTest, simple_add_task){
     ASSERT_EQ(tp.get_handled_tasks_num(), 1);
 }
 
-INSTANTIATE_TEST_CASE_P(test_threadpool, ThreadPoolTest, ::testing::Range(1, 10));
+TEST_P(ThreadPoolTest, add_task_change_local_var){
+    ThreadPool tp;
+    int *local = new int(1);
+    tp.start();
+    tp.enqueue([local](){
+        *local = 3;
+    });
+    tp.stop();
+    ASSERT_EQ(*local, 3);
+}
+
+
+INSTANTIATE_TEST_CASE_P(test_threadpool, ThreadPoolTest, ::testing::Range(1, MAX_LOOP_NUM));

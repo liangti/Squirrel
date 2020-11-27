@@ -16,8 +16,12 @@ void ThreadPool::start(){
                 // critical area, need lock for thread safe
                 {
                     std::unique_lock<std::mutex> guard(lock);
+                    // release the lock and wait till condition meet
+                    this->condition.wait(guard, [this](){
+                        return !this->begin || !this->tasks.empty();
+                    });
+                    // finished waiting and acquire the lock again
                     if(!this->begin && this->tasks.empty()){
-                        guard.unlock();
                         return;
                     }
                     if(this->tasks.empty()){
@@ -27,9 +31,8 @@ void ThreadPool::start(){
                     task = this->tasks.front();
                     this->tasks.pop();
                     this->handled_tasks_num++;
-                    guard.unlock();
+                    task();
                 }
-                // task();
             }
         }));
     }
@@ -40,16 +43,16 @@ void ThreadPool::enqueue(const Task& task){
     {
         std::unique_lock<std::mutex> guard(lock);
         tasks.emplace(task);
-        guard.unlock();
     }
+    condition.notify_one();
 }
 
 void ThreadPool::stop(){
     {
         std::unique_lock<std::mutex> guard(lock);
         begin = false;
-        guard.unlock();
     }
+    condition.notify_all();
     for(auto itr = workers.cbegin(); itr != workers.cend(); itr++){
         (*itr)->join();
         delete (*itr);
