@@ -9,6 +9,7 @@ add_library(
     squirrel
     src/memory/allocator.cpp
     src/string/string.cpp
+    src/thread/threadpool.cpp
 )
 
 target_include_directories(

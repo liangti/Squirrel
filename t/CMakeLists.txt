@@ -10,6 +10,7 @@ foreach(
     01-memory-allocator
     02-shared-pointer
     03-string-basic
+    04-threadpool
 )
     add_executable(${TEST}.t ${TEST}.t.cpp)
     target_include_directories(
