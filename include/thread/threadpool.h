@@ -12,8 +12,7 @@ namespace sql{
 
 class ThreadPool{
 public:
-    static const int thread_pool_size = 3;
-    ThreadPool();
+    ThreadPool(int pool_size=3);
     typedef std::function<void()> Task;
     void start();
     void stop();
@@ -27,6 +26,9 @@ public:
     inline int get_handled_tasks_num(){
         return handled_tasks_num;
     }
+    inline int get_pool_size(){
+        return pool_size;
+    }
 
 private:
     typedef std::vector<std::thread*> Threads;
@@ -36,6 +38,7 @@ private:
     std::condition_variable condition;
     bool begin;
     int handled_tasks_num;
+    int pool_size;
 };
 
 }; // namespace sql

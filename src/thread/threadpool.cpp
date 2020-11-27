@@ -2,14 +2,14 @@
 
 namespace sql{
 
-ThreadPool::ThreadPool(){
+ThreadPool::ThreadPool(int pool_size): pool_size(pool_size){
     handled_tasks_num = 0;
 }
 
 void ThreadPool::start(){
     begin = true;
-    workers.reserve(thread_pool_size);
-    for(int i = 0; i < thread_pool_size; i++){
+    workers.reserve(pool_size);
+    for(int i = 0; i < pool_size; i++){
         workers.emplace_back(new std::thread([this](){
             while(true){
                 Task task;
