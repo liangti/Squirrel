@@ -11,6 +11,7 @@ foreach(
     02-shared-pointer
     03-string-basic
     04-threadpool
+    05-tuple
 )
     add_executable(${TEST}.t ${TEST}.t.cpp)
     target_include_directories(
