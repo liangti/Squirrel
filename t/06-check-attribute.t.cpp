@@ -8,6 +8,12 @@ public:
     int x;
 };
 
+class B{};
+
 TEST(test_has_attribute, has_attrbute){
-    EXPECT_TRUE(sql::checkattr<A>::value);
+    EXPECT_TRUE(sql::checkattr<A>::value); // has member x
+}
+
+TEST(test_has_attribute, has_no_attribute){
+    EXPECT_FALSE(sql::checkattr<B>::value); // doesn't have member x
 }
