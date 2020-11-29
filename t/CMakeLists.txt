@@ -12,6 +12,7 @@ foreach(
     03-string-basic
     04-threadpool
     05-tuple
+    06-check-attribute
 )
     add_executable(${TEST}.t ${TEST}.t.cpp)
     target_include_directories(
