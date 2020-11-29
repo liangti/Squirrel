@@ -46,4 +46,4 @@ TEST_P(ThreadPoolTest, add_tasks_more_than_pool_size){
     ASSERT_EQ(tp.get_handled_tasks_num(), tasks_num);
 }
 
-INSTANTIATE_TEST_CASE_P(test_threadpool, ThreadPoolTest, ::testing::Range(1, MAX_LOOP_NUM));
+INSTANTIATE_TEST_SUITE_P(test_threadpool, ThreadPoolTest, ::testing::Range(1, MAX_LOOP_NUM));
