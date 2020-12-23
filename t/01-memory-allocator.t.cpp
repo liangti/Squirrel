@@ -5,14 +5,9 @@ using namespace sql;
 
 class MemoryAllocatorTest: public ::testing::Test {
 protected:
-    void SetUp() override{
-        begin = (char *)sbrk(0);
-    }
     void TearDown(){
-        reset(begin);
+        reset();
     }
-private:
-    char* begin;
 };
 
 
@@ -73,4 +68,13 @@ TEST_F(MemoryAllocatorTest, coalesce_block){
     Block *block2 = coalesce_block(block);
     ASSERT_EQ(block, block2);
     ASSERT_EQ(block2->size, sizeof(size_t) * 2);
+}
+
+TEST_F(MemoryAllocatorTest, memory_size){
+    size_t init_size = memory_size();
+    auto data = alloc(sizeof(size_t));
+    Block *block = get_block_header(data);
+    ASSERT_EQ(memory_size() - init_size, alloc_size(sizeof(size_t)));
+    alloc(sizeof(size_t));
+    ASSERT_EQ(memory_size() - init_size, 2 * alloc_size(sizeof(size_t)));
 }

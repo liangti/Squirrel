@@ -9,12 +9,14 @@ namespace {
 Block *heap_start = nullptr;
 Block *heap_top = heap_start;
 
+// heap begin address
+char* heap_begin = (char *)sbrk(0);
 }; // anonymous namespace
 
-// reset heap
-void reset(char* begin){
-    char* top = (char *)sbrk(0);
-    sbrk(begin - top);
+// reset heap start position
+void reset(){
+    heap_start = nullptr;
+    heap_top = heap_start;
 }
 
 /*
@@ -122,6 +124,10 @@ Block* coalesce_block(Block *block){
         block->next = walk_ptr->next;
     }
     return block;
+}
+
+size_t memory_size(){
+    return (char *)sbrk(0) - heap_begin;
 }
 
 }; // namespace sql

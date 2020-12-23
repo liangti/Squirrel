@@ -30,6 +30,8 @@ size_t align(size_t);
 
 word_t *alloc(size_t);
 
+size_t alloc_size(size_t);
+
 Block *request_from_os(size_t);
 
 Block *get_block_header(word_t*);
@@ -42,7 +44,9 @@ Block *split_block(Block*,size_t);
 
 Block* coalesce_block(Block *);
 
-void reset(char*);
+void reset();
+
+size_t memory_size();
 
 }; // namespace sql
 
