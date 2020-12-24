@@ -2,11 +2,13 @@
 #define INCLUDED_THREAD_H
 
 #include <functional>
+#include <future>
 #include <vector>
 #include <thread>
 #include <mutex>
 #include <queue>
 #include <condition_variable>
+#include <utility>
 
 namespace sql{
 
@@ -16,7 +18,10 @@ public:
     typedef std::function<void()> Task;
     void start();
     void stop();
-    void enqueue(const Task&);
+
+    template<class T, class... Args>
+    auto enqueue(T&& t, Args&&... args) ->
+    std::future<typename std::result_of<T(Args...)>::type>;
 
     // remove copy methods
     ThreadPool(const ThreadPool&)=delete;
@@ -40,6 +45,24 @@ private:
     int handled_tasks_num;
     int pool_size;
 };
+template<class T, class... Args>
+auto ThreadPool::enqueue(T&& t, Args&&... args) ->
+std::future<typename std::result_of<T(Args...)>::type>{
+    using return_type = typename std::result_of<T(Args...)>::type;
+
+    auto task = std::make_shared<std::packaged_task<return_type()>>(
+        std::bind(std::forward<T>(t), std::forward<Args>(args)...)
+    );
+    std::future<return_type> result = task->get_future();
+    {
+        std::unique_lock<std::mutex> guard(lock);
+        tasks.emplace([task](){
+            (*task)();
+        });
+    }
+    condition.notify_one();
+    return result;
+}
 
 }; // namespace sql
 

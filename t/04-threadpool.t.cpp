@@ -46,4 +46,20 @@ TEST_P(ThreadPoolTest, add_tasks_more_than_pool_size){
     ASSERT_EQ(tp.get_handled_tasks_num(), tasks_num);
 }
 
+TEST_P(ThreadPoolTest, add_task_with_parameters){
+    bool flag = false;
+    auto func = [&flag](int a) -> int {
+        flag = true;
+        return a + 1;
+    };
+    ThreadPool tp;
+    tp.start();
+    EXPECT_FALSE(flag);
+    auto result = tp.enqueue(func, 1);
+    tp.stop();
+    EXPECT_TRUE(flag);
+    ASSERT_EQ(tp.get_handled_tasks_num(), 1);
+    ASSERT_EQ(result.get(), 2);
+}
+
 INSTANTIATE_TEST_SUITE_P(test_threadpool, ThreadPoolTest, ::testing::Range(1, MAX_LOOP_NUM));

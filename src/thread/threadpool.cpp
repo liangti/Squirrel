@@ -38,15 +38,6 @@ void ThreadPool::start(){
     }
 }
 
-void ThreadPool::enqueue(const Task& task){
-    // critical area, need lock for thread safe
-    {
-        std::unique_lock<std::mutex> guard(lock);
-        tasks.emplace(task);
-    }
-    condition.notify_one();
-}
-
 void ThreadPool::stop(){
     {
         std::unique_lock<std::mutex> guard(lock);
