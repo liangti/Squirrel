@@ -29,3 +29,12 @@ TEST(test_tuple, tuple_size){
     Tuple<char, int, double> tuple('a', 1, 0.3);
     ASSERT_EQ(size(tuple), 3);
 }
+
+TEST(test_tuple, make_tuple){
+    int a = 3;
+    auto tuple = make_tuple('a', 1, a);
+    a = 4;
+    ASSERT_EQ(get<0>(tuple), 'a');
+    ASSERT_EQ(get<1>(tuple), 1);
+    ASSERT_EQ(get<2>(tuple), 3);
+}

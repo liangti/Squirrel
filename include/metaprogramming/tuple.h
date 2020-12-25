@@ -1,6 +1,8 @@
 #ifndef INCLUDED_TUPLE_H
 #define INCLUDED_TUPLE_H
 
+#include <functional>
+
 namespace sql{
 
 // Tuple
@@ -59,6 +61,27 @@ template<template <typename...> class Tuple,
          typename... ts>
 int size(Tuple<t, ts...> &tuple){
     return 1 + size(tuple.tail);
+}
+
+// make_tuple
+// for automatically deducing types of input parameters
+
+template<typename T>
+struct unwrap_reference{
+    using type = T;
+};
+
+template<typename T>
+struct unwrap_reference<std::reference_wrapper<T>>{
+    using type = T&;
+};
+
+template<typename T>
+using special_decay_t = typename unwrap_reference<typename std::decay<T>::type>::type;
+
+template<typename... Args>
+auto make_tuple(Args&&... args){
+    return Tuple<special_decay_t<Args>...>(std::forward<Args>(args)...);
 }
 
 }; // namespace sql
