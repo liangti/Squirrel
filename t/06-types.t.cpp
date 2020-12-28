@@ -3,6 +3,20 @@
 
 using namespace sql;
 
+// for testing enable_if
+template<typename T>
+typename enable_if<is_array<T>::value, bool>::type is_array_v(){
+    return true;
+}
+
+template<typename T>
+typename enable_if<!is_array<T>::value, bool>::type is_array_v(){
+    return false;
+}
+
+// for testing result_of
+int func(int){return 1;}
+
 TEST(test_types, check_type_equivalent){
     bool t1 = same_t<int, int>::value;
     bool t2 = same_t<int, double>::value;
@@ -96,4 +110,24 @@ TEST(test_types, decay_types){
     EXPECT_TRUE(t3);
     EXPECT_TRUE(t4);
     EXPECT_TRUE(t5);
+}
+
+TEST(test_types, enable_if){
+    bool t1 = is_array<int>();
+    bool t2 = is_array<int[]>();
+    bool t3 = is_array<int[3]>();
+    EXPECT_FALSE(t1);
+    EXPECT_TRUE(t2);
+    EXPECT_TRUE(t3);
+}
+
+TEST(test_types, result_of){
+    // not support overload since decltype<f> is confused if f has overload copies
+    auto f = [](int a)->int{return a+1;};
+    using type1 = result_of<decltype(f)(int)>::type;
+    using type2 = result_of<decltype(&func)(int)>::type;
+    bool t1 = same_t<type1, int>::value;
+    bool t2 = same_t<type2, int>::value;
+    EXPECT_TRUE(t1);
+    EXPECT_TRUE(t2);
 }

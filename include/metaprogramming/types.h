@@ -112,6 +112,24 @@ public:
     >::type;
 };
 
+// enable_if<bool, T> contains type=T if bool=true
+template<bool, typename T=void>
+struct enable_if{};
+
+template<typename T>
+struct enable_if<true, T>{
+    using type = T;
+};
+
+// result_of<T> contains the type of T's return type
+template<typename T>
+struct result_of{};
+
+template<typename F, typename... Args>
+struct result_of<F(Args...)>{
+    using type = decltype(std::declval<F>()(std::declval<Args>()...));
+};
+
 }; // namespace sql
 
 #endif
