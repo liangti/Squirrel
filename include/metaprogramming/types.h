@@ -130,6 +130,21 @@ struct result_of<F(Args...)>{
     using type = decltype(std::declval<F>()(std::declval<Args>()...));
 };
 
+// address_of(a) returns address of an object
+// why not &a? because sometimes object can overload oeprator &
+// address_of handle that, see test for an example
+template<typename T>
+typename enable_if<std::is_object<T>::value, T*>::type address_of(T& t){
+    // because object can overload operator
+    // consider T contains cv qualifier
+    return reinterpret_cast<T*>(&const_cast<char &>(reinterpret_cast<const char &>(t)));
+}
+
+template<typename T>
+typename enable_if<!std::is_object<T>::value, T*>::type address_of(T& t){
+    return &t;
+}
+
 }; // namespace sql
 
 #endif

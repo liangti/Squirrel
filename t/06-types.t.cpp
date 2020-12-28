@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 #include <metaprogramming/types.h>
 
+#include <functional>
+#include <memory>
+#include <vector>
+
 using namespace sql;
 
 // for testing enable_if
@@ -16,6 +20,17 @@ typename enable_if<!is_array<T>::value, bool>::type is_array_v(){
 
 // for testing result_of
 int func(int){return 1;}
+
+// for testing address_of
+class DiffRef{
+public:
+    DiffRef* operator*(){
+        return this;
+    }
+    int operator&() const{
+        return 10;
+    }
+};
 
 TEST(test_types, check_type_equivalent){
     bool t1 = same_t<int, int>::value;
@@ -122,7 +137,7 @@ TEST(test_types, enable_if){
 }
 
 TEST(test_types, result_of){
-    // not support overload since decltype<f> is confused if f has overload copies
+    // not support overload since decltype<f> is ambiguous if f has overload copies
     auto f = [](int a)->int{return a+1;};
     using type1 = result_of<decltype(f)(int)>::type;
     using type2 = result_of<decltype(&func)(int)>::type;
@@ -130,4 +145,23 @@ TEST(test_types, result_of){
     bool t2 = same_t<type2, int>::value;
     EXPECT_TRUE(t1);
     EXPECT_TRUE(t2);
+}
+
+TEST(test_types, address_of){
+    DiffRef dr;
+    const DiffRef& dr2 = dr;
+    ASSERT_EQ(&dr, 10);
+    ASSERT_EQ(*dr, address_of(dr));
+    ASSERT_EQ(&dr2, 10);
+    ASSERT_EQ(*dr, address_of(dr2)); // dr dr2 should have same address
+}
+
+TEST(test_types, reference_wrapper){
+    std::vector<int> v1{1,2,3};
+    std::vector<int> v2{v1.begin(), v1.end()};
+    std::vector<std::reference_wrapper<int>> v3{v1.begin(), v1.end()};
+    v1[0] = 100;
+    ASSERT_EQ(v1[0], 100);
+    ASSERT_EQ(v2[0], 1);
+    ASSERT_EQ(v3[0], 100);
 }
