@@ -2,6 +2,7 @@
 #define INCLUDED_TYPES_H
 
 #include <type_traits>
+#include <utility>
 
 namespace sql{
 
@@ -144,6 +145,38 @@ template<typename T>
 typename enable_if<!std::is_object<T>::value, T*>::type address_of(T& t){
     return &t;
 }
+
+template <class T> constexpr T& FUN(T& t) noexcept { return t; }
+template <class T> void FUN(T&&) = delete;
+
+// reference_wrapper<T> wrap a reference into a copyable assignable object
+template<typename T>
+class reference_wrapper{
+public:
+    // construct
+    reference_wrapper(const T& t){
+        _ptr = const_cast<T*>(address_of(t));
+    }
+    reference_wrapper(T&& t) = delete;
+
+    // copyable
+    reference_wrapper(const reference_wrapper&) = default;
+
+    // assignable
+    reference_wrapper& operator=(const reference_wrapper&) = default;
+
+    // access
+    T& operator *(){
+        return *_ptr;
+    }
+
+    // destroy
+    ~reference_wrapper(){
+        _ptr = nullptr;
+    }
+private:
+    T* _ptr;
+};
 
 }; // namespace sql
 

@@ -157,6 +157,7 @@ TEST(test_types, address_of){
 }
 
 TEST(test_types, reference_wrapper){
+    // try std::reference_wrapper, not support in sql::reference_wrapper yet
     std::vector<int> v1{1,2,3};
     std::vector<int> v2{v1.begin(), v1.end()};
     std::vector<std::reference_wrapper<int>> v3{v1.begin(), v1.end()};
@@ -164,4 +165,11 @@ TEST(test_types, reference_wrapper){
     ASSERT_EQ(v1[0], 100);
     ASSERT_EQ(v2[0], 1);
     ASSERT_EQ(v3[0], 100);
+
+    int i = 1;
+    sql::reference_wrapper<int> i1(i); // lvalue
+    // sql::reference_wrapper<int> i2(1); // rvalue is not allowed
+    ASSERT_EQ(*i1, 1);
+    i = 3;
+    ASSERT_EQ(*i1, 3);
 }
