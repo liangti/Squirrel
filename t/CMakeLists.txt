@@ -13,6 +13,7 @@ foreach(
     04-threadpool
     05-tuple
     06-types
+    07-vector
 )
     add_executable(${TEST}.t ${TEST}.t.cpp)
     target_include_directories(
