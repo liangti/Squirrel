@@ -4,10 +4,25 @@
 
 using namespace sql;
 
+// no default constructor
 class A{
 public:
     A(int x): data(new int(x)){}
-    A(const A&) = delete;
+    A() = delete;
+    int* data;
+};
+
+// no assignment operator method
+class B{
+public:
+    B(int x): data(new int(x)){};
+    // only resize & push_back require = operator
+    B& operator=(const B& other){
+        if(this != &other){
+            data = new int(-1);
+        }
+        return *this;
+    };
     int* data;
 };
 
@@ -120,8 +135,11 @@ TEST(test_vector, initialize_with_no_default_constructor_object){
 }
 
 TEST(test_vector, emplace_back_does_no_copy){
-    Vector<A> v;
-    size_t test_size = 2000;
+    Vector<B> v;
+    // resize() involves = operator
+    // make size smaller than vector original size
+    // to avoid resize()
+    size_t test_size = 20;
     for(int i = 0; i < test_size; i++){
         v.emplace_back(i);
     }

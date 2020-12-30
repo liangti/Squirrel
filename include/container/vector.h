@@ -61,7 +61,7 @@ public:
     }
 
     void push_back(const T& t){
-        check_size(_top + 1);
+        _check_size(_top + 1);
         T* current = _begin + _top;
         *current = t;
         _top++;
@@ -76,7 +76,7 @@ public:
 
     template<typename... Args>
     void emplace_back(Args&&... args){
-        check_size(_top + 1);
+        _check_size(_top + 1);
         // placement new is to create an object in existing address space
         T* current = new(_begin + _top) T(std::forward<Args>(args)...);
         _top++;
@@ -91,6 +91,7 @@ public:
     }
 
     void resize(size_t new_capacity){
+        _capacity = new_capacity;
         T* new_begin = _allocate(new_capacity);
 
         // copy old elements
@@ -104,12 +105,6 @@ public:
         _begin = new_begin;
     }
 
-    void check_size(size_t required){
-        if(required > _capacity){
-            _capacity *= 2;
-            resize(_capacity);
-        }
-    }
 
 protected:
     size_t _capacity;
@@ -123,8 +118,15 @@ protected:
         _end = _begin + _capacity;
     }
 
+    // TODO: does it work fine with objects with virtual?
     T* _allocate(size_t capacity){
         return reinterpret_cast<T*>(operator new[](capacity * sizeof(T)));
+    }
+    
+    void _check_size(size_t required){
+        if(required > _capacity){
+            resize(_capacity * 2);
+        }
     }
 };
 

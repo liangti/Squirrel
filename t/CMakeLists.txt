@@ -14,6 +14,7 @@ foreach(
     05-tuple
     06-types
     07-vector
+    08-queue
 )
     add_executable(${TEST}.t ${TEST}.t.cpp)
     target_include_directories(
