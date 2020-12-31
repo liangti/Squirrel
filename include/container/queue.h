@@ -2,6 +2,8 @@
 #define INCLUDED_QUEUE_H
 
 #define MAX_QUEUE_NUM 50
+// buffer for requesting memory to make it a bit safer
+#define BUFFER 10000
 
 #include <utility>
 
@@ -67,7 +69,7 @@ private:
 
     // TODO: does it work fine with objects with virtual?
     T* _allocate(size_t capacity){
-        return reinterpret_cast<T*>(operator new[](capacity * sizeof(T)));
+        return reinterpret_cast<T*>(operator new[](capacity * sizeof(T) + BUFFER));
     }
 
     inline void _push(){

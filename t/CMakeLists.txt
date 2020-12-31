@@ -15,6 +15,7 @@ foreach(
     06-types
     07-vector
     08-queue
+    09-safe-queue
 )
     add_executable(${TEST}.t ${TEST}.t.cpp)
     target_include_directories(
