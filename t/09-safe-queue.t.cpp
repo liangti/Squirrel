@@ -7,9 +7,11 @@ using namespace sql;
 static const int MAX_LOOP_NUM = 10;
 
 class SafeQueueTest: public ::testing::TestWithParam<int> {};
+class BlockFreeQueueTest: public ::testing::TestWithParam<int> {};
 
-TEST_P(SafeQueueTest, simple_producer){
-    SafeQueue<int> sq(1000);
+template<template<class> class Q, typename D=int>
+void test_producer_simple(){
+    Q<D> sq(1000);
     auto producer = [&sq](size_t test_size){
         for(size_t i = 0; i < test_size; i++){
             if(i % 2 == 0){
@@ -31,7 +33,8 @@ TEST_P(SafeQueueTest, simple_producer){
     ASSERT_EQ(sq.size(), 800);
 }
 
-TEST_P(SafeQueueTest, simple_consumer){
+template<template<class> class Q, typename D=int>
+void test_consumer_simple(){
     size_t test_size = 1000;
     SafeQueue<int> sq(test_size);
     for(size_t i = 0; i < test_size; i++){
@@ -56,4 +59,22 @@ TEST_P(SafeQueueTest, simple_consumer){
     ASSERT_EQ(sq.size(), 0);
 }
 
+TEST_P(SafeQueueTest, simple_producer){
+    test_producer_simple<SafeQueue>();
+}
+
+TEST_P(SafeQueueTest, simple_consumer){
+    test_producer_simple<SafeQueue>();
+}
+
+TEST_P(BlockFreeQueueTest, simple_producer){
+    test_producer_simple<BlockFreeQueue>();
+}
+
+TEST_P(BlockFreeQueueTest, simple_consumer){
+    test_consumer_simple<BlockFreeQueue>();
+}
+
 INSTANTIATE_TEST_SUITE_P(test_safe_queue, SafeQueueTest, ::testing::Range(1, MAX_LOOP_NUM));
+INSTANTIATE_TEST_SUITE_P(test_block_free_queue, BlockFreeQueueTest,
+                         ::testing::Range(1, MAX_LOOP_NUM));
