@@ -82,6 +82,18 @@ private:
 
 /*
 Still in experiment
+
+This Queue uses CAS to implement spinlock to achive threadsafe
+
+For adding new element it needs to compete the follwing items in given order:
+- compete for size(_count++)
+- compete for write address(_tail++)
+- compete for write access(state=free)
+
+For poping element it also needs to compete the following items in given order:
+- compete for size(_count--)
+- compete for pop address(_head++)
+- compete for write access(state=ready)
 */
 template<typename T>
 class BlockFreeQueue{
@@ -97,8 +109,15 @@ public:
     }
 
     size_t wait_for_push(){
+        size_t temp_count;
+        size_t new_count;
         size_t temp_tail;
         size_t new_tail;
+        // compete for size
+        do{
+            temp_count = _count;
+            new_count = temp_count + 1;
+        } while(new_count < _capacity && !_count.compare_exchange_strong(temp_count, new_count));
         // compete for a location
         do{
             temp_tail = _tail;
@@ -131,8 +150,18 @@ public:
     }
 
     void pop(){
+        size_t temp_count;
+        size_t new_count;
         size_t temp_head;
         size_t new_head;
+        do{
+            temp_count = _count;
+            new_count = temp_count - 1;
+        } while(new_count >= 0 && !_count.compare_exchange_strong(temp_count, new_count));
+        do{
+            temp_head = _head;
+            new_head = _head = (temp_head + 1) % _capacity;
+        } while(!_head.compare_exchange_strong(temp_head, new_head));
         State* current_state = _state_root + temp_head;
         state ready_state = ready;
         // wait for the address to ready
@@ -140,11 +169,6 @@ public:
         while(!(*current_state).compare_exchange_strong(ready_state, free)){
             ready_state = ready;
         }
-        do{
-            temp_head = _head;
-            new_head = _head = (temp_head + 1) % _capacity;
-        } while(!_head.compare_exchange_strong(temp_head, new_head));
-        _count--;
     }
     
     size_t size(){
