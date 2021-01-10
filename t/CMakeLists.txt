@@ -29,10 +29,13 @@ foreach(
         PRIVATE
         ${GTEST_INCLUDE_DIRS}
     )
+    set(USER_LIBS_DIR /usr/local/lib)
     target_link_libraries(
         ${TEST}.t
         squirrel
         ${GTEST_BOTH_LIBRARIES}
+        ${USER_LIBS_DIR}/libgmock.a
+        ${USER_LIBS_DIR}/libgmock_main.a
     )
     add_test(
         NAME ${TEST}
