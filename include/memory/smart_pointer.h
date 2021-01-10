@@ -3,18 +3,47 @@
 
 namespace sql{
 
-template<typename T>
+class _allocator_base{
+public:
+    template<typename T>
+    static void clean(T* data){
+        delete data;
+    }
+};
+
+// should not be used externally
+
+class _counter_allocator: _allocator_base{
+private:
+    static size_t _free_size;
+public:
+    template<typename T>
+    static void clean(T* data){
+        _allocator_base::clean(data);
+        _free_size += sizeof(T);
+    }
+    static size_t get_free_size(){
+        return _free_size;
+    }
+    static void reset_free_size(){
+        _free_size = 0;
+    }
+};
+
+// smart pointers expose to users
+
+template<typename T, class LocalAllocator=_allocator_base>
 class shared_ptr{
 private:
     int* count;
     T* ptr;
 public:
-    shared_ptr(T* _ptr){
-        ptr = _ptr;
-        count = new int(1);
+    shared_ptr(T* _ptr)
+    : ptr(_ptr), count(new int(1)){
     }
 
-    shared_ptr(const shared_ptr<T> &other){
+    template<typename Allocator>
+    shared_ptr(shared_ptr<T, Allocator> &other){
         count = other.count;
         ptr = other.ptr;
         (*count)++;
@@ -22,21 +51,38 @@ public:
 
     ~shared_ptr(){
         if((*count) == 1){
-            delete count;
-            delete ptr;
+            LocalAllocator::clean(count);
+            LocalAllocator::clean(ptr);
+        }
+        else{
+            (*count)--;
         }
     }
     T* operator->(){
         return ptr;
     }
-    shared_ptr<T>& operator=(const shared_ptr<T>& rhs){
+
+    template<typename Allocator>
+    shared_ptr<T, LocalAllocator>& operator=(shared_ptr<T, Allocator>& rhs){
         count = rhs.count;
         ptr = rhs.ptr;
-        (*count)++;
+        if(this != &rhs){
+            (*count)++;
+        }
+        return *this;
     }
 
-    T* operator*(){
-        return ptr;
+    T& operator*(){
+        return *ptr;
+    }
+
+    void reset(){
+        delete count;
+        delete ptr;
+    }
+
+    int get_count(){
+        return *count;
     }
 };
 
