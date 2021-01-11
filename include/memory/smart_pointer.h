@@ -11,26 +11,48 @@ public:
     }
 };
 
-// should not be used externally
+// smart pointers expose to users
 
-class _counter_allocator: _allocator_base{
+template<typename T, class LocalAllocator=_allocator_base>
+class unique_ptr{
 private:
-    static size_t _free_size;
+    T* ptr;
 public:
-    template<typename T>
-    static void clean(T* data){
-        _allocator_base::clean(data);
-        _free_size += sizeof(T);
+    unique_ptr(T* _ptr): ptr(_ptr){
     }
-    static size_t get_free_size(){
-        return _free_size;
+
+    template<typename Allocator>
+    unique_ptr(unique_ptr<T, Allocator> &other){
+        ptr = other.ptr;
+        if(this != &other){
+            other.ptr = nullptr;
+        }
     }
-    static void reset_free_size(){
-        _free_size = 0;
+    template<typename Allocator>
+    unique_ptr<T, LocalAllocator>& operator=(unique_ptr<T, Allocator> &other){
+        ptr = other.ptr;
+        if(this != &other){
+            other.ptr = nullptr;
+        }
+        return *this;
+    }
+
+    ~unique_ptr(){
+        LocalAllocator::clean(ptr);
+    }
+    
+    T* operator->(){
+        return ptr;
+    }
+    
+    T& operator*(){
+        return *ptr;
+    }
+
+    bool is_null(){
+        return ptr == nullptr;
     }
 };
-
-// smart pointers expose to users
 
 template<typename T, class LocalAllocator=_allocator_base>
 class shared_ptr{
@@ -38,21 +60,21 @@ private:
     int* count;
     T* ptr;
 public:
-    shared_ptr(T* _ptr)
-    : ptr(_ptr), count(new int(1)){
+    shared_ptr(T* _ptr): ptr(_ptr), count(new int(1)){
     }
 
     template<typename Allocator>
     shared_ptr(shared_ptr<T, Allocator> &other){
         count = other.count;
         ptr = other.ptr;
-        (*count)++;
+        if(this != &other){
+            (*count)++;
+        }
     }
 
     ~shared_ptr(){
         if((*count) == 1){
-            LocalAllocator::clean(count);
-            LocalAllocator::clean(ptr);
+            reset();
         }
         else{
             (*count)--;
@@ -77,8 +99,8 @@ public:
     }
 
     void reset(){
-        delete count;
-        delete ptr;
+        LocalAllocator::clean(count);
+        LocalAllocator::clean(ptr);
     }
 
     int get_count(){
