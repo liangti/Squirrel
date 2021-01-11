@@ -54,8 +54,12 @@ public:
     }
 };
 
+template<typename T>
+class weak_ptr;
+
 template<typename T, class LocalAllocator=_allocator_base>
 class shared_ptr{
+    friend weak_ptr<T>;
 private:
     int* count;
     T* ptr;
@@ -101,6 +105,34 @@ public:
     void reset(){
         LocalAllocator::clean(count);
         LocalAllocator::clean(ptr);
+    }
+
+    int get_count(){
+        return *count;
+    }
+};
+
+template<typename T>
+class weak_ptr{
+private:
+    T* ptr;
+    int* count;
+public:
+    weak_ptr(shared_ptr<T>& sp){
+        ptr = sp.ptr;
+        count = sp.count;
+    }
+    weak_ptr<T>& operator=(shared_ptr<T>& sp){
+        ptr = sp.ptr;
+        count = sp.count;
+        return *this;
+    }
+    T& operator*(){
+        return *ptr;
+    }
+
+    T* operator->(){
+        return ptr;
     }
 
     int get_count(){

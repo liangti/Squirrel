@@ -96,3 +96,26 @@ TEST(shared_ptr_tests, do_not_recycle_memory_when_not_all_release){
     ASSERT_EQ(my_ptr.get_count(), 1);
     ASSERT_EQ(_test_allocator::get_free_size(), 0);
 }
+
+TEST(weak_ptr_test, dereference){
+    int* i = new int(3);
+    shared_ptr<int> sp(i);
+    weak_ptr<int> wp(sp);
+    ASSERT_EQ(*wp, *i);
+}
+
+TEST(weak_ptr_test, member_access){
+    Obj *obj = new Obj(3);
+    shared_ptr<Obj> sp(obj);
+    weak_ptr<Obj> wp(sp);
+    ASSERT_EQ(wp->x, 3);
+}
+
+TEST(weak_ptr_test, rely_on_shared_pointer_reference_count){
+    int *i = new int(3);
+    shared_ptr<int> sp(i);
+    weak_ptr<int> wp(sp);
+    ASSERT_EQ(wp.get_count(), 1);
+    shared_ptr<int> sp2 = sp;
+    ASSERT_EQ(wp.get_count(), 2);
+}
