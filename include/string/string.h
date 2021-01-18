@@ -1,6 +1,7 @@
 #ifndef INCLUDED_STRING_H
 #define INCLUDED_STRING_H
 
+#include <memory/allocator.h>
 namespace sql{
 
 void _strcpy(char*, const char*);
@@ -18,6 +19,9 @@ public:
     const char* c_str();
 private:
     char *s_data;
+    Allocator<char> allocator;
+    char* allocate(size_t);
+    void deallocate(char*);
 };
 
 }; // namespace sql
