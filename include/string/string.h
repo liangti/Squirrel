@@ -19,7 +19,7 @@ public:
     const char* c_str();
 private:
     char *s_data;
-    Allocator<char> allocator;
+    sql::Allocator<char> allocator;
     char* allocate(size_t);
     void deallocate(char*);
 };

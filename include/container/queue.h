@@ -6,6 +6,7 @@
 #define BUFFER 10000
 
 #include <utility>
+#include <memory/allocator.h>
 
 namespace sql{
 
@@ -50,6 +51,9 @@ public:
         return _count;
     }
 
+    ~Queue(){
+        _deallocate(_root);
+    }
     // do not allow resize
 
 private:
@@ -58,6 +62,7 @@ private:
     size_t _tail;
     size_t _count;
     size_t _capacity;
+    sql::Allocator<T> _allocator;
 
     void _init_space(size_t capacity){
         _capacity = capacity;
@@ -69,7 +74,11 @@ private:
 
     // TODO: does it work fine with objects with virtual?
     T* _allocate(size_t capacity){
-        return reinterpret_cast<T*>(operator new[](capacity * sizeof(T) + BUFFER));
+        return _allocator.allocate(capacity + 2); // 2 is for buffer for safe
+    }
+
+    void _deallocate(T* begin){
+        _allocator.deallocate(begin);
     }
 
     inline void _push(){

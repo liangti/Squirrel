@@ -2,6 +2,7 @@
 #define INCLUDED_VECTOR_H
 
 #include <initializer_list>
+#include <memory/allocator.h>
 
 namespace sql{
 
@@ -101,12 +102,13 @@ public:
             *current = *previous;
         }
         // delete old stuffs
-        delete[] _begin;
+        _deallocate(_begin);
         _begin = new_begin;
     }
 
 
 protected:
+    sql::Allocator<T> _allocator;
     size_t _capacity;
     size_t _top;
     T* _begin;
@@ -120,9 +122,11 @@ protected:
 
     // TODO: does it work fine with objects with virtual?
     T* _allocate(size_t capacity){
-        return reinterpret_cast<T*>(operator new[](capacity * sizeof(T)));
+        return _allocator.allocate(capacity);
     }
-    
+    void _deallocate(T* begin){
+        _allocator.deallocate(begin);
+    }
     void _check_size(size_t required){
         if(required > _capacity){
             resize(_capacity * 2);
