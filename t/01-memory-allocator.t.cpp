@@ -2,8 +2,6 @@
 #include <memory/allocator.h>
 
 using namespace sql;
-using namespace internal;
-
 struct TestObj{
     int x;
     int y;

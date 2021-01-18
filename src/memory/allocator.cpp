@@ -3,8 +3,6 @@
 
 namespace sql{
 
-using namespace internal;
-
 class AllocatorImpl{
 private:
     Block* head;

@@ -1,9 +1,5 @@
 #include <unistd.h>
-#include <utility>
 #include <memory/allocator_utils.h>
-
-
-namespace internal{
 
 
 /*
@@ -20,15 +16,15 @@ size_t align(size_t n){
 }
 
 size_t alloc_size(size_t size){
-    return size + sizeof(Block);
+    return size + sizeof(struct Block);
 }
 
-Block *request_from_os(size_t size){
+struct Block* request_from_os(size_t size){
     // current top of the heap
     // if sbrk success, it will also be the beginning of the new block
-    auto block = (Block *)sbrk(0);
+    struct Block* block = (struct Block *)sbrk(0);
     if (sbrk(alloc_size(size)) == (void *)-1){
-        return nullptr;
+        return NULL;
     }
     block->size = size;
     block->used = true;
@@ -37,17 +33,17 @@ Block *request_from_os(size_t size){
 
 
 
-Block *get_block_header(word_t *data){
-    return (Block *)((char *)data - sizeof(BlockHeader));
+struct Block* get_block_header(word_t *data){
+    return (struct Block*)((char *)data - sizeof(struct BlockHeader));
 }
 
 // Mark block as unused
 void free(word_t *data){
-    auto block = get_block_header(data);
+    struct Block* block = get_block_header(data);
     block->used = false;
 }
 
-void split_block(Block *block, size_t size){
+void split_block(struct Block* block, size_t size){
     if(block->used){
         return;
     }
@@ -57,30 +53,28 @@ void split_block(Block *block, size_t size){
         return;
     }
     
-    Block *new_block = (Block *)((char*)(block) + size + sizeof(BlockHeader));
+    struct Block *new_block = (struct Block *)((char*)(block) + size + sizeof(struct BlockHeader));
     new_block->size = block->size - size;
     block->size = size;
 
     // add new block into the chain
-    Block *previous_next = block->next;
+    struct Block *previous_next = block->next;
     block->next = new_block;
     new_block->next = previous_next;
 }
 
 // only walk one step
-void coalesce_block(Block *block){
-    if(block == nullptr){
+void coalesce_block(struct Block *block){
+    if(block == NULL){
         return;
     }
     if(block->used){
         return;
     }
-    Block *walk_ptr = block->next;
-    if(walk_ptr != nullptr && !walk_ptr->used){
+    struct Block *walk_ptr = block->next;
+    if(walk_ptr != NULL && !walk_ptr->used){
         block->size += walk_ptr->size;
         block->next = walk_ptr->next;
     }
     return;
 }
-
-}; // namespace sql

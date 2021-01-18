@@ -11,8 +11,8 @@ private:
     AllocatorImpl* impl;
 public:
     AllocatorBase();
-    internal::word_t* allocate(size_t);
-    void deallocate(internal::word_t*);
+    word_t* allocate(size_t);
+    void deallocate(word_t*);
     void clear();
     size_t allocated_size();
 };
@@ -28,7 +28,7 @@ public:
         return (T*)base.allocate(size * sizeof(T));
     }
     virtual void deallocate(T* t){
-        base.deallocate((internal::word_t*)t);
+        base.deallocate((word_t*)t);
     }
     virtual void clear(){
         base.clear();

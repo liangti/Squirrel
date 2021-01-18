@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.6)
 
-project(Squirrel CXX)
+project(Squirrel C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(
     squirrel
+    src/memory/allocator_utils.c
     src/memory/allocator.cpp
-    src/memory/allocator_utils.cpp
     src/string/string.cpp
     src/thread/threadpool.cpp
 )
