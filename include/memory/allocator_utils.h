@@ -6,7 +6,8 @@
 #include <stdbool.h>
 
 #define word_t intptr_t
-
+#define block_t struct Block
+#define block_header_t struct BlockHeader
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,15 +37,15 @@ word_t *alloc(size_t);
 
 size_t alloc_size(size_t);
 
-struct Block *request_from_os(size_t);
+block_t* request_from_os(size_t);
 
-struct Block *get_block_header(word_t*);
+block_t* get_block_header(word_t*);
 
-struct Block *find_free_block(size_t);
+block_t* find_free_block(size_t);
 
-void split_block(struct Block*, size_t);
+void split_block(block_t*, size_t);
 
-void coalesce_block(struct Block *);
+void coalesce_block(block_t*);
 
 void reset();
 
