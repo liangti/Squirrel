@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(
     squirrel
     src/memory/allocator.cpp
+    src/memory/allocator_utils.cpp
     src/string/string.cpp
     src/thread/threadpool.cpp
 )

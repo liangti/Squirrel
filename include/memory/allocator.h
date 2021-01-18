@@ -1,52 +1,45 @@
 #ifndef INCLUDED_MEMORY_ALLOCATOR_H
 #define INCLUDED_MEMORY_ALLOCATOR_H
-#include <stdint.h>
-#include <cstddef>
+#include <memory/allocator_utils.h>
 
 namespace sql{
 
+class AllocatorImpl;
 
-
-using word_t = intptr_t;
-
-const size_t word_s = sizeof(word_t);
-
-struct Block{
-    size_t size;
-
-    bool used;
-
-    Block *next;
-    
-    /* 
-    basic payload of the block
-    but not necessarily sizeof(data[1]) is the whole memory
-    block represent, size represents the size of the block
-    */
-    word_t data[1];
+class AllocatorBase{
+private:
+    AllocatorImpl* impl;
+public:
+    AllocatorBase();
+    internal::word_t* allocate(size_t);
+    void deallocate(internal::word_t*);
+    void clear();
+    size_t allocated_size();
 };
 
-size_t align(size_t);
-
-word_t *alloc(size_t);
-
-size_t alloc_size(size_t);
-
-Block *request_from_os(size_t);
-
-Block *get_block_header(word_t*);
-
-void free(word_t*);
-
-Block *find_free_block(size_t);
-
-Block *split_block(Block*,size_t);
-
-Block* coalesce_block(Block *);
-
-void reset();
-
-size_t memory_size();
+// allocator interface
+template<typename T>
+class Allocator{
+private:
+    int x;
+public:
+    AllocatorBase base;
+    virtual T* allocate(size_t size){
+        return (T*)base.allocate(size * sizeof(T));
+    }
+    virtual void deallocate(T* t){
+        base.deallocate((internal::word_t*)t);
+    }
+    virtual void clear(){
+        base.clear();
+    }
+    virtual ~Allocator(){
+        clear();
+    }
+    size_t allocated_size(){
+        return base.allocated_size();
+    }
+};
 
 }; // namespace sql
 
