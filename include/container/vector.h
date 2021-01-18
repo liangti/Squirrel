@@ -102,7 +102,7 @@ public:
             *current = *previous;
         }
         // delete old stuffs
-        _deallocate(_begin);
+        _deallocate(_begin, _top);
         _begin = new_begin;
     }
 
@@ -124,8 +124,8 @@ protected:
     T* _allocate(size_t capacity){
         return _allocator.allocate(capacity);
     }
-    void _deallocate(T* begin){
-        _allocator.deallocate(begin);
+    void _deallocate(T* begin, size_t size){
+        _allocator.deallocate(begin, size);
     }
     void _check_size(size_t required){
         if(required > _capacity){

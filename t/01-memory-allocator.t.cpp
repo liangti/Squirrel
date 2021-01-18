@@ -2,10 +2,15 @@
 #include <memory/allocator.h>
 
 using namespace sql;
-struct TestObj{
+static bool call_destructor = false;
+class TestObj{
+public:
     int x;
     int y;
     double z;
+    ~TestObj(){
+        call_destructor = true;
+    }
 };
 static Allocator<TestObj> allocator;
 
@@ -70,14 +75,14 @@ TEST_F(MemoryAllocatorTest, alloc_block){
     EXPECT_TRUE(block->used);
     ASSERT_EQ(block->size, sizeof(TestObj));
     ASSERT_EQ(block->next, nullptr);
-    allocator.deallocate(data);
+    allocator.deallocate(data, 0);
     EXPECT_FALSE(block->used);
 }
 
 TEST_F(MemoryAllocatorTest, reuse_block){
     auto data = allocator.allocate(1);
     Block *block = get_block_header((word_t*)data);
-    allocator.deallocate(data);
+    allocator.deallocate(data, 0);
     EXPECT_FALSE(block->used);
 
     data = allocator.allocate(1);
@@ -92,4 +97,11 @@ TEST_F(MemoryAllocatorTest, memory_size){
     ASSERT_EQ(allocator.allocated_size(), sizeof(TestObj));
     allocator.allocate(1);
     ASSERT_EQ(allocator.allocated_size(), 2 * sizeof(TestObj));
+}
+
+TEST_F(MemoryAllocatorTest, deallocate_call_destructor){
+    auto data = allocator.allocate(1);
+    call_destructor = false;
+    allocator.deallocate(data, 1);
+    EXPECT_TRUE(call_destructor);
 }

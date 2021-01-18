@@ -100,7 +100,8 @@ void String::deallocate(char* data){
     if(data == nullptr){
         return;
     }
-    allocator.deallocate(data);
+    // char* does not need destructor
+    allocator.deallocate(data, 0);
 }
 
 };

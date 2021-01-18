@@ -52,7 +52,7 @@ public:
     }
 
     ~Queue(){
-        _deallocate(_root);
+        _deallocate(_root, _count);
     }
     // do not allow resize
 
@@ -77,8 +77,8 @@ private:
         return _allocator.allocate(capacity + 2); // 2 is for buffer for safe
     }
 
-    void _deallocate(T* begin){
-        _allocator.deallocate(begin);
+    void _deallocate(T* begin, size_t size){
+        _allocator.deallocate(begin, size);
     }
 
     inline void _push(){
