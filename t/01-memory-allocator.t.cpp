@@ -105,3 +105,12 @@ TEST_F(MemoryAllocatorTest, deallocate_call_destructor){
     allocator.deallocate(data, 1);
     EXPECT_TRUE(call_destructor);
 }
+
+TEST_F(MemoryAllocatorTest, all_allocators_share_state){
+    Allocator<TestObj> allocator2;
+    ASSERT_EQ(allocator2.allocated_size(), 0);
+    auto data = allocator.allocate(1);
+    ASSERT_EQ(allocator2.allocated_size(), sizeof(TestObj));
+    allocator.deallocate(data, 1);
+    ASSERT_EQ(allocator2.allocated_size(), 0);
+}

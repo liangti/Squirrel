@@ -31,6 +31,10 @@ struct BlockHeader{
     struct Block* next;
 };
 
+extern block_t* _block_head;
+extern block_t* _block_top;
+extern size_t _block_allocated;
+
 size_t align(size_t);
 
 word_t *alloc(size_t);
