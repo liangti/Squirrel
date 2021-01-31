@@ -52,6 +52,9 @@ public:
     }
     void deallocate(word_t* p) {
         BlockHeader* header = manager.get_block_header(p);
+        if(header == nullptr){
+            return;
+        }
         if(header->used){
             _allocated -= header->size;
         }
