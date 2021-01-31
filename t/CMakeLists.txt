@@ -7,15 +7,15 @@ configure_file(
 
 foreach(
     TEST
-    01-memory-allocator
-    02-shared-pointer
-    03-string-basic
-    04-threadpool
-    05-tuple
-    06-types
-    07-vector
-    08-queue
-    09-safe-queue
+    memory-allocator
+    shared-pointer
+    string-basic
+    threadpool
+    tuple
+    types
+    vector
+    queue
+    safe-queue
 )
     add_executable(${TEST}.t ${TEST}.t.cpp)
     target_include_directories(
