@@ -91,3 +91,12 @@ TEST(test_string_basic, string_concatenation){
     ASSERT_STREQ(b.c_str(), "def");
     ASSERT_STREQ(c.c_str(), "abcdef");
 }
+
+TEST(test_string_basic, string_comparison){
+    String a("abc");
+    String b("def");
+    String c("abcas");
+    EXPECT_TRUE(a == a);
+    EXPECT_FALSE(a == b);
+    EXPECT_FALSE(a == c);
+}
