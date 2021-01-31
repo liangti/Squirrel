@@ -3,18 +3,11 @@
 
 namespace sql{
 
-namespace {
-static Block* _head = _block_head;
-static Block* _top = _block_top;
-static size_t _allocated = _block_allocated;
-
-}; // anonymous namespace
-
 class AllocatorImpl{
 private:
     BlockManager manager;
     Block* find_free_block(size_t size){
-        auto block = _head;
+        auto block = manager.get_head();
 
         while(block != nullptr){
             if (block->used || block->size < size){
@@ -29,52 +22,19 @@ public:
     AllocatorImpl(){}
     word_t* allocate(size_t size) {
         size = align(size);
-        if(auto block = find_free_block(size)){
-            block->used = true;
-            _allocated += size;
-            return block->data;
+        Block* block = find_free_block(size);
+        if(block == nullptr){
+            block = request_from_os(size);
         }
-        auto block = request_from_os(size);
-        block->next = nullptr;
-        if (_head == nullptr){
-            _head = block;
-        }
-        // Chain the blocks
-        if (_top != nullptr){
-            _top->next = block;
-        }
-        _top = block;
-        _allocated += block->size;
-
-        // add to BlockManager
+        block->used = true;
+        // add to BlockManager no matter what
         manager.add_block(block->data, (BlockHeader*)block);
         return block->data;
     }
     void deallocate(word_t* p) {
-        BlockHeader* header = manager.get_block_header(p);
-        if(header == nullptr){
-            return;
-        }
-        if(header->used){
-            _allocated -= header->size;
-        }
-        header->used = false;
-    }
-    void clear(){
-        Block* ptr = _head;
-        while(ptr != nullptr){
-            deallocate(ptr->data); 
-            ptr = ptr->next;
-        }
-        _head = nullptr;
-        _top = nullptr;
-        // TODO: sbrk negative
-    }
-    size_t allocated_size(){
-        return _allocated;
+        manager.free_block(p);
     }
     ~AllocatorImpl(){
-        clear();
     }
 };
 
@@ -90,12 +50,5 @@ void AllocatorBase::deallocate(word_t* p){
     impl->deallocate(p);
 }
 
-void AllocatorBase::clear(){
-    impl->clear();
-}
-
-size_t AllocatorBase::allocated_size(){
-    return impl->allocated_size();
-}
 
 }; // namespace sql

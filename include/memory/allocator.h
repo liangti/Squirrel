@@ -13,8 +13,6 @@ public:
     AllocatorBase();
     word_t* allocate(size_t);
     void deallocate(word_t*);
-    void clear();
-    size_t allocated_size();
 };
 
 // allocator interface
@@ -36,14 +34,7 @@ public:
         }
         base.deallocate((word_t*)t);
     }
-    virtual void clear(){
-        base.clear();
-    }
     virtual ~Allocator(){
-        clear();
-    }
-    size_t allocated_size(){
-        return base.allocated_size();
     }
 };
 

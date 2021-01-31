@@ -14,15 +14,17 @@ public:
     }
 };
 static Allocator<TestObj> allocator;
+static BlockViewer viewer;
+static BlockManager manager;
 
 class MemoryAllocatorTest: public ::testing::Test {
 protected:
     void SetUp(){
-        ASSERT_EQ(allocator.allocated_size(), 0);
+        ASSERT_EQ(viewer.size(), 0);
     }
     void TearDown(){
-        allocator.clear();
-        ASSERT_EQ(allocator.allocated_size(), 0);
+        manager.clear();
+        ASSERT_EQ(viewer.size(), 0);
     }   
 };
 
@@ -70,13 +72,16 @@ TEST(memory_allocator_utils_test, coalesce_block){
 }
 
 TEST_F(MemoryAllocatorTest, alloc_block){
+    ASSERT_EQ(viewer.size(), 0);
     auto data = allocator.allocate(1);
+    ASSERT_EQ(viewer.size(), sizeof(TestObj));
     Block *block = get_block_header((word_t*)data);
     ASSERT_EQ(&block->data[0], (word_t*)data);
     EXPECT_TRUE(block->used);
     ASSERT_EQ(block->size, sizeof(TestObj));
     ASSERT_EQ(block->next, nullptr);
     allocator.deallocate(data, 0);
+    ASSERT_EQ(viewer.size(), 0);
     EXPECT_FALSE(block->used);
 }
 
@@ -93,11 +98,11 @@ TEST_F(MemoryAllocatorTest, reuse_block){
 }
 
 TEST_F(MemoryAllocatorTest, memory_size){
-    ASSERT_EQ(allocator.allocated_size(), 0);
+    ASSERT_EQ(viewer.size(), 0);
     allocator.allocate(1);
-    ASSERT_EQ(allocator.allocated_size(), sizeof(TestObj));
+    ASSERT_EQ(viewer.size(), sizeof(TestObj));
     allocator.allocate(1);
-    ASSERT_EQ(allocator.allocated_size(), 2 * sizeof(TestObj));
+    ASSERT_EQ(viewer.size(), 2 * sizeof(TestObj));
 }
 
 TEST_F(MemoryAllocatorTest, deallocate_call_destructor){
@@ -109,11 +114,11 @@ TEST_F(MemoryAllocatorTest, deallocate_call_destructor){
 
 TEST_F(MemoryAllocatorTest, all_allocators_share_state){
     Allocator<TestObj> allocator2;
-    ASSERT_EQ(allocator2.allocated_size(), 0);
+    ASSERT_EQ(viewer.size(), 0);
     auto data = allocator.allocate(1);
-    ASSERT_EQ(allocator2.allocated_size(), sizeof(TestObj));
+    ASSERT_EQ(viewer.size(), sizeof(TestObj));
     allocator.deallocate(data, 1);
-    ASSERT_EQ(allocator2.allocated_size(), 0);
+    ASSERT_EQ(viewer.size(), 0);
 }
 
 TEST_F(MemoryAllocatorTest, block_manager_basic){
@@ -124,9 +129,4 @@ TEST_F(MemoryAllocatorTest, block_manager_basic){
     // add a block through allocator
     auto data = allocator.allocate(1);
     EXPECT_TRUE(manager.valid_block((BlockData*)data));
-
-    // add a block manually
-    BlockHeader header;
-    manager.add_block((BlockData*)obj1, &header);
-    EXPECT_TRUE(manager.valid_block((BlockData*)obj1));
 }

@@ -15,7 +15,23 @@ public:
     ~BlockManager() = default;
     void add_block(BlockData*, BlockHeader*);
     bool valid_block(BlockData*);
+    void free_block(BlockData*);
     BlockHeader* get_block_header(BlockData*);
+    Block* get_head();
+    Block* get_top();
+    void clear();
+};
+
+/*
+Block Viewer
+Different from Allocator, Viewer does not participate in Block
+manipulation. It only view the memory block status
+*/
+class BlockViewer{
+public:
+    BlockViewer() = default;
+    size_t num();
+    size_t size();
 };
 
 }; // namespace sql
