@@ -1,4 +1,4 @@
-#include<gtest/gtest.h>
+#include <gtest/gtest.h>
 #include <string/string.h>
 
 using namespace sql;
@@ -16,15 +16,31 @@ TEST(test_string_utils, strlen){
     delete[] c;
 }
 
+TEST(test_string_utils, strcmp){
+    char* a = "abc";
+    char* b = "abedf";
+    char* c = "abc";
+    EXPECT_TRUE(_strncmp(a, b, 0));
+    EXPECT_TRUE(_strncmp(a, b, 1));
+    EXPECT_TRUE(_strncmp(a, b, 2));
+    EXPECT_FALSE(_strncmp(a, b, 3));
+    EXPECT_FALSE(_strncmp(a, b, 4));
+    EXPECT_FALSE(_strncmp(a, b, 5));
+    EXPECT_TRUE(_strcmp(a, c));
+    EXPECT_FALSE(_strcmp(a, b));
+}
+
 TEST(test_string_basic, simple_constructor){
     String s("abc");
     ASSERT_STREQ(s.c_str(), "abc");
+    ASSERT_EQ(s.size(), 3);
 }
 
 TEST(test_string_basic, copy_constructor){
     String s("abc");
     String ss(s);
     ASSERT_STREQ(ss.c_str(), "abc");
+    ASSERT_EQ(ss.size(), 3);
 }
 
 TEST(test_string_basic, move_constructor){
@@ -32,12 +48,16 @@ TEST(test_string_basic, move_constructor){
     String ss(std::move(s));
     ASSERT_STREQ(ss.c_str(), "abc");
     EXPECT_TRUE(s.c_str() == nullptr);
+    ASSERT_EQ(s.size(), 0);
+    ASSERT_EQ(ss.size(), 3);
 }
 
 TEST(test_string_basic, copy_assignment){
     String s("abc");
     String ss = s;
     ASSERT_STREQ(ss.c_str(), "abc");
+    ASSERT_EQ(s.size(), 3);
+    ASSERT_EQ(ss.size(), 3);
 }
 
 TEST(test_string_basic, move_assignment){
@@ -45,18 +65,22 @@ TEST(test_string_basic, move_assignment){
     String ss = std::move(s);
     ASSERT_STREQ(ss.c_str(), "abc");
     EXPECT_TRUE(s.c_str() == nullptr);
+    ASSERT_EQ(s.size(), 0);
+    ASSERT_EQ(ss.size(), 3);
 }
 
 TEST(test_string_basic, copy_self_assignment){
     String s("abc");
     s = s;
     ASSERT_STREQ(s.c_str(), "abc");
+    ASSERT_EQ(s.size(), 3);
 }
 
 TEST(test_string_basic, move_self_assignment){
     String s("abc");
     s = std::move(s);
     ASSERT_STREQ(s.c_str(), "abc");
+    ASSERT_EQ(s.size(), 3);
 }
 
 TEST(test_string_basic, string_concatenation){
