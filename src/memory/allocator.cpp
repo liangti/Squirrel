@@ -1,5 +1,5 @@
+#include <memory/utility.h>
 #include <memory/allocator.h>
-#include <memory/block.h>
 
 namespace sql{
 
@@ -12,6 +12,7 @@ static size_t _allocated = _block_allocated;
 
 class AllocatorImpl{
 private:
+    BlockManager manager;
     Block* find_free_block(size_t size){
         auto block = _head;
 
@@ -45,14 +46,16 @@ public:
         _top = block;
         _allocated += block->size;
 
+        // add to BlockManager
+        manager.add_block(block->data, (BlockHeader*)block);
         return block->data;
     }
     void deallocate(word_t* p) {
-        Block* block = get_block_header(p);
-        if(block->used){
-            _allocated -= block->size;
+        BlockHeader* header = manager.get_block_header(p);
+        if(header->used){
+            _allocated -= header->size;
         }
-        block->used = false;
+        header->used = false;
     }
     void clear(){
         Block* ptr = _head;

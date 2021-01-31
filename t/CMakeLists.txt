@@ -8,7 +8,7 @@ configure_file(
 foreach(
     TEST
     memory-allocator
-    shared-pointer
+    smart-pointer
     string-basic
     threadpool
     tuple

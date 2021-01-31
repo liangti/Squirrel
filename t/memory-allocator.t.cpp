@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <memory/allocator.h>
+#include <memory/utility.h>
 
 using namespace sql;
 static bool call_destructor = false;
@@ -113,4 +114,19 @@ TEST_F(MemoryAllocatorTest, all_allocators_share_state){
     ASSERT_EQ(allocator2.allocated_size(), sizeof(TestObj));
     allocator.deallocate(data, 1);
     ASSERT_EQ(allocator2.allocated_size(), 0);
+}
+
+TEST_F(MemoryAllocatorTest, block_manager_basic){
+    BlockManager manager;
+    TestObj* obj1 = new TestObj();
+    EXPECT_FALSE(manager.valid_block((BlockData*)obj1));
+
+    // add a block through allocator
+    auto data = allocator.allocate(1);
+    EXPECT_TRUE(manager.valid_block((BlockData*)data));
+
+    // add a block manually
+    BlockHeader header;
+    manager.add_block((BlockData*)obj1, &header);
+    EXPECT_TRUE(manager.valid_block((BlockData*)obj1));
 }

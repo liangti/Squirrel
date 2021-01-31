@@ -10,6 +10,7 @@ add_library(
     src/memory/block.c
     src/memory/reclaimer.cpp
     src/memory/allocator.cpp
+    src/memory/utility.cpp
     src/string/string.cpp
     src/thread/threadpool.cpp
 )
