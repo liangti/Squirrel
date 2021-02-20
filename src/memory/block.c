@@ -54,7 +54,7 @@ void split(block_t* block, size_t size){
     }
     
     block_t *new_block = (block_t *)((char*)(block) + size + sizeof(block_header_t));
-    new_block->size = block->size - size;
+    new_block->size = block->size - size - sizeof(block_header_t);
     block->size = size;
 
     // add new block into the chain

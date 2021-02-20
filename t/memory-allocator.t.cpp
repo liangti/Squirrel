@@ -50,15 +50,19 @@ TEST(memory_allocator_utils_test, request_from_os){
 }
 
 TEST(memory_allocator_utils_test, split_block){
-    Block* block = request_from_os(sizeof(TestObj) * 2);
+    Block* block = request_from_os(sizeof(TestObj) * 4);
+    // split will not change used block
     split(block, sizeof(TestObj));
+    ASSERT_EQ(block->size, sizeof(TestObj) * 4);
+    // split will not change block if with given size larger than block
     block->used = false;
-    split(block, sizeof(TestObj) * 3);
-    ASSERT_EQ(block->size, sizeof(TestObj) * 2);
-    split(block, sizeof(TestObj));
+    split(block, sizeof(TestObj) * 30);
+    ASSERT_EQ(block->size, sizeof(TestObj) * 4);
+    
+    split(block, sizeof(TestObj) * 2);
     EXPECT_TRUE(block->next != nullptr);
     EXPECT_FALSE(block->next->used);
-    ASSERT_EQ(block->next->size, sizeof(TestObj));
+    ASSERT_EQ(block->next->size, sizeof(TestObj) * 2 - sizeof(BlockHeader));
 }
 
 TEST(memory_allocator_utils_test, coalesce_block){
