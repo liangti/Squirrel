@@ -9,6 +9,9 @@ public:
     int x;
     int y;
     double z;
+    TestObj(){
+        call_destructor = false;
+    }
     ~TestObj(){
         call_destructor = true;
     }
@@ -118,7 +121,6 @@ TEST_F(MemoryAllocatorTest, memory_size){
 
 TEST_F(MemoryAllocatorTest, deallocate_call_destructor){
     auto data = allocator.allocate(1);
-    call_destructor = false;
     allocator.deallocate(data, 1);
     EXPECT_TRUE(call_destructor);
 }
