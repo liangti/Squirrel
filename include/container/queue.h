@@ -2,6 +2,7 @@
 #define INCLUDED_QUEUE_H
 
 #define MAX_QUEUE_NUM 50
+#define QUEUE_BUFFER 2
 // buffer for requesting memory to make it a bit safer
 #define BUFFER 10000
 
@@ -74,7 +75,7 @@ private:
 
     // TODO: does it work fine with objects with virtual?
     T* _allocate(size_t capacity){
-        return _allocator.allocate(capacity + 2); // 2 is for buffer for safe
+        return _allocator.allocate(capacity + QUEUE_BUFFER); // 2 is for buffer for safe
     }
 
     void _deallocate(T* begin, size_t size){
