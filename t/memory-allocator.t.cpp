@@ -48,34 +48,34 @@ TEST(memory_allocator_utils_test, get_header){
 
 TEST(memory_allocator_utils_test, request_from_os){
     Block* block = request_from_os(sizeof(TestObj));
-    ASSERT_EQ(block->size, sizeof(TestObj));
-    EXPECT_TRUE(block->used);
+    ASSERT_EQ(size_get(block), sizeof(TestObj));
+    EXPECT_TRUE(used(block));
 }
 
 TEST(memory_allocator_utils_test, split_block){
     Block* block = request_from_os(sizeof(TestObj) * 4);
     // split will not change used block
     split(block, sizeof(TestObj));
-    ASSERT_EQ(block->size, sizeof(TestObj) * 4);
+    ASSERT_EQ(size_get(block), sizeof(TestObj) * 4);
     // split will not change block if with given size larger than block
-    block->used = false;
+    used_clear(block);
     split(block, sizeof(TestObj) * 30);
-    ASSERT_EQ(block->size, sizeof(TestObj) * 4);
-    
+    ASSERT_EQ(size_get(block), sizeof(TestObj) * 4);
+
     split(block, sizeof(TestObj) * 2);
     EXPECT_TRUE(block->next != nullptr);
-    EXPECT_FALSE(block->next->used);
-    ASSERT_EQ(block->next->size, sizeof(TestObj) * 2 - sizeof(BlockHeader));
+    EXPECT_FALSE(used(block->next));
+    ASSERT_EQ(size_get(block->next), sizeof(TestObj) * 2 - sizeof(BlockHeader));
 }
 
 TEST(memory_allocator_utils_test, coalesce_block){
     Block* block = request_from_os(sizeof(TestObj));
     Block* block2 = request_from_os(sizeof(TestObj));
-    block->used = false;
-    block2->used = false;
+    used_clear(block);
+    used_clear(block2);
     block->next = block2;
     coalesce_block(block);
-    ASSERT_EQ(block->size, sizeof(TestObj) * 2);
+    ASSERT_EQ(size_get(block), sizeof(TestObj) * 2);
 }
 
 TEST_F(MemoryAllocatorTest, alloc_block){
@@ -84,24 +84,24 @@ TEST_F(MemoryAllocatorTest, alloc_block){
     ASSERT_EQ(viewer.size(), sizeof(TestObj));
     Block *block = get_header((word_t*)data);
     ASSERT_EQ(&block->data[0], (word_t*)data);
-    EXPECT_TRUE(block->used);
-    ASSERT_EQ(block->size, sizeof(TestObj));
+    EXPECT_TRUE(used(block));
+    ASSERT_EQ(size_get(block), sizeof(TestObj));
     ASSERT_EQ(block->next, nullptr);
     allocator.deallocate(data, 0);
     ASSERT_EQ(viewer.size(), 0);
-    EXPECT_FALSE(block->used);
+    EXPECT_FALSE(used(block));
 }
 
 TEST_F(MemoryAllocatorTest, reuse_block){
     auto data = allocator.allocate(1);
     Block *block = get_header((word_t*)data);
     allocator.deallocate(data, 0);
-    EXPECT_FALSE(block->used);
+    EXPECT_FALSE(used(block));
 
     data = allocator.allocate(1);
     Block *block2 = get_header((word_t*)data);
     ASSERT_EQ(block, block2);
-    EXPECT_TRUE(block->used);
+    EXPECT_TRUE(used(block));
 }
 
 TEST_F(MemoryAllocatorTest, find_free_block_will_also_split){

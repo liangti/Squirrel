@@ -25,7 +25,8 @@ void BlockManager::add_block(BlockData* data, BlockHeader* header){
         }
         _block_top = block;
     }
-    _memory_size += header->size;
+    _memory_size += size_get((Block*)header);
+    used_set((Block*)header);
 }
 
 bool BlockManager::valid_block(BlockData* data){
@@ -44,10 +45,10 @@ void BlockManager::free_block(BlockData* data){
     auto temp = _block_map.find(data);
     if(temp != _block_map.cend()){
         BlockHeader* header = temp->second;
-        if(header->used){
-            _memory_size -= header->size;
+        if(used((Block*)header)){
+            _memory_size -= size_get((Block*)header);
         }
-        header->used = false;
+        used_clear((Block*)header);
     }
 }
 
@@ -56,7 +57,7 @@ void BlockManager::split_block(Block* block, size_t size){
     // insert next block into map
     Block* next_block = block->next;
     _block_map.insert(std::make_pair((BlockData*)next_block->data, (BlockHeader*)next_block));
-    _memory_size += block->size;
+    _memory_size += size_get(block);
 }
 
 Block* BlockManager::get_head(){
@@ -69,7 +70,7 @@ Block* BlockManager::get_top(){
 
 void BlockManager::clear(){
     for(auto itr = _block_map.begin(); itr != _block_map.end(); itr++){
-        itr->second->used = false;
+        used_clear((Block*)itr->second);
     }
     _memory_size = 0;
 }

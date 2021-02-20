@@ -1,6 +1,25 @@
 #include <unistd.h>
 #include <memory/block.h>
 
+bool used(block_t* block){
+    return block->_size & 1;
+}
+
+void used_set(block_t* block){
+    block->_size |= 1;
+}
+
+void used_clear(block_t* block){
+    block->_size &= ~1;
+}
+
+size_t size_get(block_t* block){
+    return block->_size ^ (block->_size & 1);
+}
+
+void size_set(block_t* block, size_t size){
+    block->_size = size;
+}
 
 /*
 Memory Align:
@@ -26,8 +45,8 @@ block_t* request_from_os(size_t size){
     if (sbrk(alloc_size(size)) == (void *)-1){
         return NULL;
     }
-    block->size = size;
-    block->used = true;
+    size_set(block, size);
+    used_set(block);
     return block;
 }
 
@@ -40,22 +59,22 @@ block_t* get_header(word_t *data){
 // Mark block as unused
 void free(word_t *data){
     block_t* block = get_header(data);
-    block->used = false;
+    used_clear(block);
 }
 
 void split(block_t* block, size_t size){
-    if(block->used){
+    if(used(block)){
         return;
     }
     
     // assume size here is already align
-    if(block->size <= size){
+    if(size_get(block) <= size){
         return;
     }
     
     block_t *new_block = (block_t *)((char*)(block) + size + sizeof(block_header_t));
-    new_block->size = block->size - size - sizeof(block_header_t);
-    block->size = size;
+    size_set(new_block, size_get(block) - size - sizeof(block_header_t));
+    size_set(block, size);
 
     // add new block into the chain
     block_t *previous_next = block->next;
@@ -68,12 +87,12 @@ void coalesce_block(block_t *block){
     if(block == NULL){
         return;
     }
-    if(block->used){
+    if(used(block)){
         return;
     }
     block_t *walk_ptr = block->next;
-    if(walk_ptr != NULL && !walk_ptr->used){
-        block->size += walk_ptr->size;
+    if(walk_ptr != NULL && !used(walk_ptr)){
+        size_set(block, size_get(block) + size_get(walk_ptr));
         block->next = walk_ptr->next;
     }
     return;

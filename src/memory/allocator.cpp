@@ -10,7 +10,7 @@ private:
         auto block = manager.get_head();
 
         while(block != nullptr){
-            if (block->used || block->size < size || block->size >= size * 2){
+            if (used(block) || size_get(block) < size || size_get(block) >= size * 2){
                 block = block->next;
                 continue;
             }
@@ -28,7 +28,6 @@ public:
         if(block == nullptr){
             block = request_from_os(size);
         }
-        block->used = true;
         // add to BlockManager no matter what
         manager.add_block(block->data, (BlockHeader*)block);
         return block->data;

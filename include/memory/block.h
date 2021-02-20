@@ -14,8 +14,10 @@ extern "C" {
 const size_t word_s = sizeof(word_t);
 
 struct Block{
-    size_t size;
-    bool used;
+    // due to the memory alignment size cannot be 1
+    // the first bit is used for marking block is using or not
+    // directly visit _size outside of block is not recommended
+    size_t _size;
     struct Block* next;
     /* 
     basic payload of the block
@@ -26,8 +28,7 @@ struct Block{
 };
 
 struct BlockHeader{
-    size_t size;
-    bool used;
+    size_t _size;
     struct Block* next;
 };
 
@@ -50,6 +51,17 @@ void split(block_t*, size_t);
 void coalesce_block(block_t*);
 
 void reset();
+
+// bitwise for embedding used in size in Block struct
+bool used(block_t*);
+
+void used_clear(block_t*);
+
+void used_set(block_t*);
+
+size_t size_get(block_t*);
+
+void size_set(block_t*, size_t);
 
 #ifdef __cplusplus
 }
