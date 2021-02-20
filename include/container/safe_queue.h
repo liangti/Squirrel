@@ -63,6 +63,7 @@ private:
     std::atomic<size_t> _count;
     std::atomic<size_t> _capacity;
     std::mutex lock;
+    sql::Allocator<T> _allocator;
 
     void _init_space(size_t capacity){
         _capacity = capacity;
@@ -74,7 +75,7 @@ private:
 
     // TODO: does it work fine with objects with virtual?
     T* _allocate(size_t capacity){
-        return reinterpret_cast<T*>(operator new[](capacity * sizeof(T) + BUFFER));
+        return _allocator.allocate(capacity + BUFFER);
     }
 
 };
@@ -191,11 +192,13 @@ private:
     std::atomic<size_t> _capacity;
     T* _data_root;
     State* _state_root;
+    sql::Allocator<T> _allocator_t;
+    sql::Allocator<State> _allocator_s;
 
     void _init_space(size_t capacity){
         _capacity = capacity;
-        _data_root = _allocate<T>(sizeof(T), capacity);
-        _state_root = _allocate<State>(sizeof(State), capacity);
+        _data_root = _allocator_t.allocate(capacity + BUFFER);
+        _state_root = _allocator_s.allocate(capacity + BUFFER);
         _head = 0;
         _tail = 0;
         _count = 0;
@@ -204,12 +207,6 @@ private:
             State* temp = _state_root + i;
             *temp = free;
         }
-    }
-
-    // TODO: does it work fine with objects with virtual?
-    template<typename U>
-    U* _allocate(size_t unit_size, size_t capacity){
-        return reinterpret_cast<U*>(operator new[](capacity * unit_size + BUFFER));
     }
 };
 
