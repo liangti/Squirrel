@@ -36,10 +36,10 @@ TEST(memory_allocator_utils_test, memory_align){
     ASSERT_EQ(align(word_s * 2), word_s * 2);
 }
 
-TEST(memory_allocator_utils_test, get_block_header){
+TEST(memory_allocator_utils_test, get_header){
     Block* block = request_from_os(sizeof(TestObj));
     word_t *data = block->data;
-    Block *header = get_block_header(data);
+    Block *header = get_header(data);
     ASSERT_EQ(block, header);
 }
 
@@ -51,11 +51,11 @@ TEST(memory_allocator_utils_test, request_from_os){
 
 TEST(memory_allocator_utils_test, split_block){
     Block* block = request_from_os(sizeof(TestObj) * 2);
-    split_block(block, sizeof(TestObj));
+    split(block, sizeof(TestObj));
     block->used = false;
-    split_block(block, sizeof(TestObj) * 3);
+    split(block, sizeof(TestObj) * 3);
     ASSERT_EQ(block->size, sizeof(TestObj) * 2);
-    split_block(block, sizeof(TestObj));
+    split(block, sizeof(TestObj));
     EXPECT_TRUE(block->next != nullptr);
     EXPECT_FALSE(block->next->used);
     ASSERT_EQ(block->next->size, sizeof(TestObj));
@@ -75,7 +75,7 @@ TEST_F(MemoryAllocatorTest, alloc_block){
     ASSERT_EQ(viewer.size(), 0);
     auto data = allocator.allocate(1);
     ASSERT_EQ(viewer.size(), sizeof(TestObj));
-    Block *block = get_block_header((word_t*)data);
+    Block *block = get_header((word_t*)data);
     ASSERT_EQ(&block->data[0], (word_t*)data);
     EXPECT_TRUE(block->used);
     ASSERT_EQ(block->size, sizeof(TestObj));
@@ -87,21 +87,28 @@ TEST_F(MemoryAllocatorTest, alloc_block){
 
 TEST_F(MemoryAllocatorTest, reuse_block){
     auto data = allocator.allocate(1);
-    Block *block = get_block_header((word_t*)data);
+    Block *block = get_header((word_t*)data);
     allocator.deallocate(data, 0);
     EXPECT_FALSE(block->used);
 
     data = allocator.allocate(1);
-    Block *block2 = get_block_header((word_t*)data);
+    Block *block2 = get_header((word_t*)data);
     ASSERT_EQ(block, block2);
     EXPECT_TRUE(block->used);
 }
 
+TEST_F(MemoryAllocatorTest, find_free_block_will_also_split){
+    auto data = allocator.allocate(2);
+    Block *block = get_header((word_t*)data);
+    ASSERT_EQ(viewer.size(), align(sizeof(TestObj) * 2));
+    allocator.deallocate(data, 0);
+    data = allocator.allocate(1);
+    EXPECT_TRUE(viewer.size() < align(sizeof(TestObj) * 2));
+}
+
 TEST_F(MemoryAllocatorTest, memory_size){
     ASSERT_EQ(viewer.size(), 0);
-    allocator.allocate(1);
-    ASSERT_EQ(viewer.size(), sizeof(TestObj));
-    allocator.allocate(1);
+    allocator.allocate(2);
     ASSERT_EQ(viewer.size(), 2 * sizeof(TestObj));
 }
 

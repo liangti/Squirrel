@@ -33,17 +33,17 @@ block_t* request_from_os(size_t size){
 
 
 
-block_t* get_block_header(word_t *data){
+block_t* get_header(word_t *data){
     return (block_t*)((char *)data - sizeof(block_header_t));
 }
 
 // Mark block as unused
 void free(word_t *data){
-    block_t* block = get_block_header(data);
+    block_t* block = get_header(data);
     block->used = false;
 }
 
-void split_block(block_t* block, size_t size){
+void split(block_t* block, size_t size){
     if(block->used){
         return;
     }

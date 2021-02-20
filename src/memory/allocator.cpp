@@ -10,10 +10,12 @@ private:
         auto block = manager.get_head();
 
         while(block != nullptr){
-            if (block->used || block->size < size){
+            if (block->used || block->size < size || block->size >= size * 2){
                 block = block->next;
                 continue;
             }
+            // TODO split the large block
+            // maybe in Reclaimer
             return block;
         }
         return nullptr;

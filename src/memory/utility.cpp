@@ -51,6 +51,14 @@ void BlockManager::free_block(BlockData* data){
     }
 }
 
+void BlockManager::split_block(Block* block, size_t size){
+    split(block, size);
+    // insert next block into map
+    Block* next_block = block->next;
+    _block_map.insert(std::make_pair((BlockData*)next_block->data, (BlockHeader*)next_block));
+    _memory_size += block->size;
+}
+
 Block* BlockManager::get_head(){
     return _block_head;
 }

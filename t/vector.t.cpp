@@ -1,8 +1,13 @@
 #include <gtest/gtest.h>
+#include <memory/utility.h>
 #include <container/vector.h>
 #include <metaprogramming/types.h>
 
+#define V_SIZE 50
+
 using namespace sql;
+
+static BlockViewer viewer;
 
 // no default constructor
 class A{
@@ -35,18 +40,25 @@ TEST(test_vector, simple_create_access){
     ASSERT_EQ(v[1], 2);
     ASSERT_EQ(v[2], 3);
     ASSERT_EQ(v.size(), 3);
+    ASSERT_EQ(viewer.size(), align(sizeof(int) * V_SIZE));
 }
 
 TEST(test_vector, resize_when_exceed_capacity){
     Vector<int> v;
     size_t test_size = 2000;
+    size_t vector_size = V_SIZE;
     for(size_t i = 0; i < test_size; i++){
         v.push_back(i);
+        // mock resize behavior
+        if(i > vector_size){
+            vector_size *= 2;
+        }
     }
     ASSERT_EQ(v.size(), test_size);
     for(size_t i = 0; i < test_size; i++){
         ASSERT_EQ(v[i], i);
     }
+    ASSERT_EQ(viewer.size(), align(sizeof(int) * vector_size));
 }
 
 TEST(test_vector, initialize_by_initializer_list){
@@ -56,6 +68,7 @@ TEST(test_vector, initialize_by_initializer_list){
     ASSERT_EQ(v[2], 3);
     ASSERT_EQ(v.size(), 3);
 
+    ASSERT_EQ(viewer.size(), align(sizeof(int) * V_SIZE));
 }
 
 TEST(test_vector, vector_iterator){
@@ -64,6 +77,7 @@ TEST(test_vector, vector_iterator){
     for(auto itr = v.begin(); itr != v.end(); itr++){
         ASSERT_EQ(*itr, element++);
     }
+    ASSERT_EQ(viewer.size(), align(sizeof(int) * V_SIZE));
 }
 
 TEST(test_vector, initialize_by_shallow_copy){
@@ -73,6 +87,7 @@ TEST(test_vector, initialize_by_shallow_copy){
     for(auto itr = v.begin(); itr != v.end(); itr++){
         ASSERT_EQ(*itr, element++);
     }
+    ASSERT_EQ(viewer.size(), align(sizeof(int) * V_SIZE) * 2);
 }
 
 TEST(test_vector, pop_back){
@@ -84,6 +99,7 @@ TEST(test_vector, pop_back){
     ASSERT_EQ(v[0], 1);
     ASSERT_EQ(v[1], 2);
     ASSERT_EQ(v[2], 100);
+    ASSERT_EQ(viewer.size(), align(sizeof(int) * V_SIZE));
 }
 
 TEST(test_vector, initialize_by_iterator){
@@ -93,6 +109,7 @@ TEST(test_vector, initialize_by_iterator){
     for(auto itr = v.cbegin(); itr != v.cend(); itr++){
         ASSERT_EQ(*itr, element++);
     }
+    ASSERT_EQ(viewer.size(), align(sizeof(int) * V_SIZE) * 2);
 }
 
 TEST(test_vector, pointer_element){
@@ -100,6 +117,7 @@ TEST(test_vector, pointer_element){
     int* i = new int(1);
     v.push_back(i);
     ASSERT_EQ(*(v[0]), 1);
+    ASSERT_EQ(viewer.size(), align(sizeof(int*) * V_SIZE));
 }
 
 // it is hard to support reference type

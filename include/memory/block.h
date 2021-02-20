@@ -43,11 +43,9 @@ size_t alloc_size(size_t);
 
 block_t* request_from_os(size_t);
 
-block_t* get_block_header(word_t*);
+block_t* get_header(word_t*);
 
-block_t* find_free_block(size_t);
-
-void split_block(block_t*, size_t);
+void split(block_t*, size_t);
 
 void coalesce_block(block_t*);
 

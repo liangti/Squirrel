@@ -41,6 +41,10 @@ public:
         }
     }
 
+    ~Vector(){
+        _deallocate(_begin, _capacity);
+    }
+
     inline T* begin() const{
         return _begin;
     }
@@ -92,7 +96,6 @@ public:
     }
 
     void resize(size_t new_capacity){
-        _capacity = new_capacity;
         T* new_begin = _allocate(new_capacity);
 
         // copy old elements
@@ -102,7 +105,9 @@ public:
             *current = *previous;
         }
         // delete old stuffs
-        _deallocate(_begin, _top);
+        _deallocate(_begin, _capacity);
+        // renew internal settings
+        _capacity = new_capacity;
         _begin = new_begin;
     }
 

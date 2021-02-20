@@ -16,6 +16,7 @@ public:
     void add_block(BlockData*, BlockHeader*);
     bool valid_block(BlockData*);
     void free_block(BlockData*);
+    void split_block(Block*, size_t);
     BlockHeader* get_block_header(BlockData*);
     Block* get_head();
     Block* get_top();
