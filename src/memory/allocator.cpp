@@ -23,13 +23,14 @@ private:
 public:
     AllocatorImpl(){}
     word_t* allocate(size_t size) {
+        bool is_new = false;
         size = align(size);
         Block* block = find_free_block(size);
         if(block == nullptr){
             block = request_from_os(size);
+            is_new = true;
         }
-        // add to BlockManager no matter what
-        manager.add_block(block->data, (BlockHeader*)block);
+        manager.add_block(block->data, (BlockHeader*)block, is_new);
         return block->data;
     }
     void deallocate(word_t* p) {

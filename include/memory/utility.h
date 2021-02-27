@@ -13,11 +13,9 @@ class BlockManager{
 public:
     BlockManager() = default;
     ~BlockManager() = default;
-    void add_block(BlockData*, BlockHeader*);
-    bool valid_block(BlockData*);
+    void add_block(BlockData*, BlockHeader*, bool);
     void free_block(BlockData*);
     void split_block(Block*, size_t);
-    BlockHeader* get_block_header(BlockData*);
     Block* get_head();
     Block* get_top();
     void clear();
@@ -31,7 +29,6 @@ manipulation. It only view the memory block status
 class BlockViewer{
 public:
     BlockViewer() = default;
-    size_t num();
     size_t size();
 };
 

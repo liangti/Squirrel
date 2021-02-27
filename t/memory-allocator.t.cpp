@@ -28,7 +28,16 @@ protected:
     void TearDown(){
         manager.clear();
         ASSERT_EQ(viewer.size(), 0);
-    }   
+        blockSafeCheck();
+    }
+
+    void blockSafeCheck(){
+        Block* itr = manager.get_head();
+        while(itr != nullptr){
+            ASSERT_FALSE(itr == itr->next);
+            itr = itr->next;
+        }
+    } 
 };
 
 TEST(memory_allocator_utils_test, memory_align){
@@ -104,7 +113,7 @@ TEST_F(MemoryAllocatorTest, reuse_block){
     EXPECT_TRUE(used(block));
 }
 
-TEST_F(MemoryAllocatorTest, find_free_block_will_also_split){
+TEST_F(MemoryAllocatorTest, find_free_block_skip_too_large_block){
     auto data = allocator.allocate(2);
     Block *block = get_header((word_t*)data);
     ASSERT_EQ(viewer.size(), align(sizeof(TestObj) * 2));
@@ -132,14 +141,4 @@ TEST_F(MemoryAllocatorTest, all_allocators_share_state){
     ASSERT_EQ(viewer.size(), sizeof(TestObj));
     allocator.deallocate(data, 1);
     ASSERT_EQ(viewer.size(), 0);
-}
-
-TEST_F(MemoryAllocatorTest, block_manager_basic){
-    BlockManager manager;
-    TestObj* obj1 = new TestObj();
-    EXPECT_FALSE(manager.valid_block((BlockData*)obj1));
-
-    // add a block through allocator
-    auto data = allocator.allocate(1);
-    EXPECT_TRUE(manager.valid_block((BlockData*)data));
 }
