@@ -118,13 +118,12 @@ public:
         do{
             temp_count = _count;
             new_count = temp_count + 1;
-        } while(new_count < _capacity && !_count.compare_exchange_strong(temp_count, new_count));
+        } while(new_count <= _capacity && !_count.compare_exchange_strong(temp_count, new_count));
         // compete for a location
         do{
             temp_tail = _tail;
             new_tail = (temp_tail + 1) % _capacity;
         } while(!_tail.compare_exchange_strong(temp_tail, new_tail));
-        _count++; 
         // compete for a location to be ready to write
         State* current_state = _state_root + temp_tail;
         state free_state = free;
@@ -161,7 +160,7 @@ public:
         } while(new_count >= 0 && !_count.compare_exchange_strong(temp_count, new_count));
         do{
             temp_head = _head;
-            new_head = _head = (temp_head + 1) % _capacity;
+            new_head = (temp_head + 1) % _capacity;
         } while(!_head.compare_exchange_strong(temp_head, new_head));
         State* current_state = _state_root + temp_head;
         state ready_state = ready;
@@ -171,15 +170,9 @@ public:
             ready_state = ready;
         }
     }
-    
+
     size_t size(){
-        if(empty()){
-            return 0;
-        }
-        if(full()){
-            return _capacity;
-        }
-        return _tail < _head ? (_tail + _capacity - _head) : (_tail - _head);
+        return _count;
     }
 
     // TODO size, empty, full

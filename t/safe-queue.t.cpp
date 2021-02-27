@@ -36,7 +36,8 @@ void test_producer_simple(){
 template<template<class> class Q, typename D=int>
 void test_consumer_simple(){
     size_t test_size = 1000;
-    SafeQueue<int> sq(test_size);
+    size_t queue_size = 1000;
+    Q<D> sq(queue_size);
     for(size_t i = 0; i < test_size; i++){
         sq.push(i);
     }
@@ -64,7 +65,7 @@ TEST_P(SafeQueueTest, simple_producer){
 }
 
 TEST_P(SafeQueueTest, simple_consumer){
-    test_producer_simple<SafeQueue>();
+    test_consumer_simple<SafeQueue>();
 }
 
 TEST_P(BlockFreeQueueTest, simple_producer){
