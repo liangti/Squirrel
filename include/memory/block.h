@@ -14,7 +14,7 @@ extern "C" {
 const size_t word_s = sizeof(word_t);
 
 struct Block{
-    // due to the memory alignment size cannot be 1
+    // due to the memory alignment, size cannot be 1
     // the first bit is used for marking block is using or not
     // directly visit _size outside of block is not recommended
     size_t _size;
