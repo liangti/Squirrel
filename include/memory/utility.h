@@ -19,13 +19,13 @@ public:
     BlockAgent(BlockAgent&& other);
     BlockAgent(const BlockAgent& other);
     BlockAgent operator=(BlockAgent&& other);
-    bool operator==(const BlockAgent& other);
-    size_t size();
-    void set_size(size_t value);
-    bool is_used();
+    bool operator==(const BlockAgent& other) const;
+    size_t size() const;
+    void set_size(size_t value) const;
+    bool is_used() const;
     void set_used(bool value);
     BlockData* get_data();
-    bool null();
+    bool null() const;
     void next();
 };
 

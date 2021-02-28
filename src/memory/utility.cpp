@@ -23,16 +23,16 @@ BlockAgent BlockAgent::operator=(BlockAgent&& other){
     _block = other._block;
     other._block = nullptr;
 }
-bool BlockAgent::operator==(const BlockAgent& other){
+bool BlockAgent::operator==(const BlockAgent& other) const{
     return _block == other._block;
 }
-size_t BlockAgent::size(){
+size_t BlockAgent::size() const{
     return size_get(_block);
 }
-void BlockAgent::set_size(size_t value){
+void BlockAgent::set_size(size_t value) const{
     return size_set(_block, value);
 }
-bool BlockAgent::is_used(){
+bool BlockAgent::is_used() const{
     return used(_block);
 }
 void BlockAgent::set_used(bool value){
@@ -46,7 +46,7 @@ void BlockAgent::set_used(bool value){
 BlockData* BlockAgent::get_data(){
     return _block->data;
 }
-bool BlockAgent::null(){
+bool BlockAgent::null() const{
     return _block == nullptr;
 }
 void BlockAgent::next(){
