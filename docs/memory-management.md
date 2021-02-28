@@ -1,6 +1,6 @@
-# Memory
+# Memory Management
 
-This document describes the design of memory management and allocation.
+This document describes the design of memory management in Squirrel.
 
 ## Principle
 
