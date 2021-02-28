@@ -1,6 +1,6 @@
 #ifndef INCLUDED_MEMORY_ALLOCATOR_H
 #define INCLUDED_MEMORY_ALLOCATOR_H
-#include <memory/block.h>
+#include <memory/utility.h>
 
 namespace sql{
 

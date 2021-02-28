@@ -6,32 +6,32 @@ namespace sql{
 class AllocatorImpl{
 private:
     BlockManager manager;
-    Block* find_free_block(size_t size){
+    BlockAgent find_free_block(size_t size){
         auto block = manager.get_head();
 
-        while(block != nullptr){
-            if (used(block) || size_get(block) < size || size_get(block) >= size * 2){
-                block = block->next;
+        while(!block.null()){
+            if (block.is_used() || block.size() < size || block.size() >= size * 2){
+                block.next();
                 continue;
             }
             // TODO split the large block
             // maybe in Reclaimer
             return block;
         }
-        return nullptr;
+        return BlockAgent();
     }
 public:
     AllocatorImpl(){}
     word_t* allocate(size_t size) {
         bool is_new = false;
         size = align(size);
-        Block* block = find_free_block(size);
-        if(block == nullptr){
-            block = request_from_os(size);
+        BlockAgent block = find_free_block(size);
+        if(block.null()){
+            block = manager.get_new_block(size);
             is_new = true;
         }
-        manager.add_block(block->data, (BlockHeader*)block, is_new);
-        return block->data;
+        manager.add_block(block, is_new);
+        return block.get_data();
     }
     void deallocate(word_t* p) {
         manager.free_block(p);

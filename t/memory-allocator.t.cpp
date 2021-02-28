@@ -32,11 +32,7 @@ protected:
     }
 
     void blockSafeCheck(){
-        Block* itr = manager.get_head();
-        while(itr != nullptr){
-            ASSERT_FALSE(itr == itr->next);
-            itr = itr->next;
-        }
+        manager.safe_check();
     } 
 };
 

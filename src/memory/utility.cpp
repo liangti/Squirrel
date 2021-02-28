@@ -8,9 +8,54 @@ extern "C"{
 };
 static size_t _memory_size = 0;
 
+
+BlockAgent::BlockAgent(Block* block): _block(block){
+
+}
+BlockAgent::BlockAgent(BlockAgent&& other){
+    _block = other._block;
+    other._block = nullptr;
+}
+BlockAgent::BlockAgent(const BlockAgent& other){
+    _block = other._block;
+}
+BlockAgent BlockAgent::operator=(BlockAgent&& other){
+    _block = other._block;
+    other._block = nullptr;
+}
+bool BlockAgent::operator==(const BlockAgent& other){
+    return _block == other._block;
+}
+size_t BlockAgent::size(){
+    return size_get(_block);
+}
+void BlockAgent::set_size(size_t value){
+    return size_set(_block, value);
+}
+bool BlockAgent::is_used(){
+    return used(_block);
+}
+void BlockAgent::set_used(bool value){
+    if(value){
+        used_set(_block);
+    }
+    else{
+        used_clear(_block);
+    }
+}
+BlockData* BlockAgent::get_data(){
+    return _block->data;
+}
+bool BlockAgent::null(){
+    return _block == nullptr;
+}
+void BlockAgent::next(){
+    _block = _block->next;
+}
+
 // mark block used and add to chain if the block is not there yet.
-void BlockManager::add_block(BlockData* data, BlockHeader* header, bool is_new){
-    auto block = (Block*)header;
+void BlockManager::add_block(BlockAgent agent, bool is_new){
+    auto block = agent._block; 
     if (is_new){
         block->next = nullptr;
         if (_block_head == nullptr){
@@ -22,8 +67,8 @@ void BlockManager::add_block(BlockData* data, BlockHeader* header, bool is_new){
         }
         _block_top = block;
     }
-    _memory_size += size_get((Block*)header);
-    used_set((Block*)header);
+    _memory_size += agent.size();
+    agent.set_used(true);
 }
 
 void BlockManager::free_block(BlockData* data){
@@ -34,17 +79,22 @@ void BlockManager::free_block(BlockData* data){
     used_clear((Block*)header);
 }
 
-void BlockManager::split_block(Block* block, size_t size){
-    split(block, size);
+BlockAgent BlockManager::get_new_block(size_t size){
+    auto block = request_from_os(size);
+    return BlockAgent(block);
+}
+
+void BlockManager::split_block(BlockAgent agent, size_t size){
+    split(agent._block, size);
     // edit memory size
 }
 
-Block* BlockManager::get_head(){
-    return _block_head;
+BlockAgent BlockManager::get_head(){
+    return BlockAgent(_block_head);
 }
 
-Block* BlockManager::get_top(){
-    return _block_top;
+BlockAgent BlockManager::get_top(){
+    return BlockAgent(_block_top);
 }
 
 void BlockManager::clear(){
@@ -52,6 +102,17 @@ void BlockManager::clear(){
         used_clear(itr);
     }
     _memory_size = 0;
+}
+
+bool BlockManager::safe_check(){
+    auto itr = _block_head;
+    while(itr != nullptr){
+        if(itr == itr->next){
+            return false;
+        }
+        itr = itr->next;
+    }
+    return true; 
 }
 
 size_t BlockViewer::size(){
