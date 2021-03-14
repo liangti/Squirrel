@@ -16,6 +16,12 @@ public:
     SafeQueue(size_t queue_size=MAX_QUEUE_NUM){
         _init_space(queue_size);
     }
+
+    ~SafeQueue(){
+        std::unique_lock<std::mutex> guard(lock);
+        _deallocate(_root, _capacity);
+    }
+
     inline bool empty(){
         return _count == 0;
     }
@@ -77,6 +83,10 @@ private:
     T* _allocate(size_t capacity){
         return _allocator.allocate(capacity + BUFFER);
     }
+    
+    void _deallocate(T* begin, size_t size){
+        _allocator.deallocate(begin, size);
+    }
 
 };
 
@@ -101,6 +111,10 @@ class BlockFreeQueue{
 public:
     BlockFreeQueue(size_t queue_size=MAX_QUEUE_NUM){
         _init_space(queue_size);
+    }
+    ~BlockFreeQueue(){
+        _deallocate();
+        _deallocate();
     }
     inline bool empty(){
         return _count == 0;
@@ -200,6 +214,11 @@ private:
             State* temp = _state_root + i;
             *temp = free;
         }
+    }
+
+    void _deallocate(){
+        _allocator_t.deallocate(_data_root, _capacity);
+        _allocator_s.deallocate(_state_root, _capacity);
     }
 };
 

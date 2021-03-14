@@ -4,7 +4,7 @@
 
 using namespace sql;
 
-static const int MAX_LOOP_NUM = 10;
+static const int MAX_LOOP_NUM = 10;  // TODO: raise the loop number to 100
 
 class SafeQueueTest: public ::testing::TestWithParam<int> {};
 class BlockFreeQueueTest: public ::testing::TestWithParam<int> {};
@@ -64,8 +64,8 @@ void test_queue_read_write(){
     size_t test_size = 1000;
     Q<D> sq(test_size);
     
-    auto producer = [&sq](size_t test_size){
-        for(size_t i = 0; i < test_size; i++){
+    auto producer = [&sq](size_t batch_size){
+        for(size_t i = 0; i < batch_size; i++){
             if(i % 2 == 0){
                 sq.push(i);
             }
