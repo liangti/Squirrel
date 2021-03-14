@@ -3,14 +3,13 @@
 
 #include <memory/block.h>
 
-namespace sql{
+namespace sql {
 
-class Reclaimer{
+class Reclaimer {
 public:
-    void run();
+  void run();
 };
 
-
-};
+}; // namespace sql
 
 #endif

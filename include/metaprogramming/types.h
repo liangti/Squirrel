@@ -4,178 +4,124 @@
 #include <type_traits>
 #include <utility>
 
-namespace sql{
+namespace sql {
 
 // same_t check types equivalent
-template<typename T, typename U>
-struct same_t: std::false_type{};
+template <typename T, typename U> struct same_t : std::false_type {};
 
-template<typename T>
-struct same_t<T, T>: std::true_type{};
+template <typename T> struct same_t<T, T> : std::true_type {};
 
 // remove_cv extract type from const volatile
 
-template<typename T>
-struct remove_cv{
-    using type = T;
-};
+template <typename T> struct remove_cv { using type = T; };
 
-template<typename T>
-struct remove_cv<const T>{
-    using type = T;
-};
+template <typename T> struct remove_cv<const T> { using type = T; };
 
-template<typename T>
-struct remove_cv<volatile T>{
-    using type = T;
-};
-template<typename T>
-struct remove_cv<const volatile T>{
-    using type = T;
-};
+template <typename T> struct remove_cv<volatile T> { using type = T; };
+template <typename T> struct remove_cv<const volatile T> { using type = T; };
 
 // conditional <bool, T, U> gives T if bool=True, else U
-template<bool, typename T, typename F>
-struct conditional{
-    using type = T;
-};
+template <bool, typename T, typename F> struct conditional { using type = T; };
 
-template<typename T, typename F>
-struct conditional<false, T, F>{
-    using type = F;
+template <typename T, typename F> struct conditional<false, T, F> {
+  using type = F;
 };
 
 // remove_reference <T> remove & && from a type
-template<typename T>
-struct remove_reference{
-    using type = T;
-};
+template <typename T> struct remove_reference { using type = T; };
 
-template<typename T>
-struct remove_reference<T&>{
-    using type = T;
-};
+template <typename T> struct remove_reference<T &> { using type = T; };
 
-template<typename T>
-struct remove_reference<T&&>{
-    using type = T;
-};
+template <typename T> struct remove_reference<T &&> { using type = T; };
 
 // remove_array <T> remove [] from a type
-template<typename T>
-struct remove_array{
-    using type = T;
-};
+template <typename T> struct remove_array { using type = T; };
 
-template<typename T>
-struct remove_array<T[]>{
-    using type = T;
-};
+template <typename T> struct remove_array<T[]> { using type = T; };
 
-template<typename T, int N>
-struct remove_array<T[N]>{
-    using type = T;
-};
+template <typename T, int N> struct remove_array<T[N]> { using type = T; };
 
 // is_array determine if a type is an array
-template<typename T>
-struct is_array: std::false_type{};
+template <typename T> struct is_array : std::false_type {};
 
-template<typename T>
-struct is_array<T[]>: std::true_type{};
+template <typename T> struct is_array<T[]> : std::true_type {};
 
-template<typename T, int N>
-struct is_array<T[N]>: std::true_type{};
+template <typename T, int N> struct is_array<T[N]> : std::true_type {};
 
-// is_function determine if a type is a function, TODO see cppreference for full support
-template<typename T>
-struct is_function: std::false_type{};
+// is_function determine if a type is a function, TODO see cppreference for full
+// support
+template <typename T> struct is_function : std::false_type {};
 
-template<typename Ret, typename... Args>
-struct is_function<Ret(Args...)>: std::true_type{};
+template <typename Ret, typename... Args>
+struct is_function<Ret(Args...)> : std::true_type {};
 
 // ...
 
 // decay <T> remove array, reference, pointer, cv from a type
-template<typename T>
-struct decay{
+template <typename T> struct decay {
 private:
-    using U = typename remove_reference<T>::type;
+  using U = typename remove_reference<T>::type;
+
 public:
-    using type = typename conditional<
-        is_array<U>::value,
-        typename remove_array<U>::type*,
-        typename conditional<
-            std::is_function<U>::value,
-            typename std::add_pointer<U>::type,
-            typename remove_cv<U>::type
-        >::type
-    >::type;
+  using type = typename conditional<
+      is_array<U>::value, typename remove_array<U>::type *,
+      typename conditional<std::is_function<U>::value,
+                           typename std::add_pointer<U>::type,
+                           typename remove_cv<U>::type>::type>::type;
 };
 
 // enable_if<bool, T> contains type=T if bool=true
-template<bool, typename T=void>
-struct enable_if{};
+template <bool, typename T = void> struct enable_if {};
 
-template<typename T>
-struct enable_if<true, T>{
-    using type = T;
-};
+template <typename T> struct enable_if<true, T> { using type = T; };
 
 // result_of<T> contains the type of T's return type
-template<typename T>
-struct result_of{};
+template <typename T> struct result_of {};
 
-template<typename F, typename... Args>
-struct result_of<F(Args...)>{
-    using type = decltype(std::declval<F>()(std::declval<Args>()...));
+template <typename F, typename... Args> struct result_of<F(Args...)> {
+  using type = decltype(std::declval<F>()(std::declval<Args>()...));
 };
 
 // address_of(a) returns address of an object
 // why not &a? because sometimes object can overload oeprator &
 // address_of handle that, see test for an example
-template<typename T>
-typename enable_if<std::is_object<T>::value, T*>::type address_of(T& t){
-    // because object can overload operator
-    // consider T contains cv qualifier
-    return reinterpret_cast<T*>(&const_cast<char &>(reinterpret_cast<const char &>(t)));
+template <typename T>
+typename enable_if<std::is_object<T>::value, T *>::type address_of(T &t) {
+  // because object can overload operator
+  // consider T contains cv qualifier
+  return reinterpret_cast<T *>(
+      &const_cast<char &>(reinterpret_cast<const char &>(t)));
 }
 
-template<typename T>
-typename enable_if<!std::is_object<T>::value, T*>::type address_of(T& t){
-    return &t;
+template <typename T>
+typename enable_if<!std::is_object<T>::value, T *>::type address_of(T &t) {
+  return &t;
 }
 
-template <class T> constexpr T& FUN(T& t) noexcept { return t; }
-template <class T> void FUN(T&&) = delete;
+template <class T> constexpr T &FUN(T &t) noexcept { return t; }
+template <class T> void FUN(T &&) = delete;
 
 // reference_wrapper<T> wrap a reference into a copyable assignable object
-template<typename T>
-class reference_wrapper{
+template <typename T> class reference_wrapper {
 public:
-    // construct
-    reference_wrapper(const T& t){
-        _ptr = const_cast<T*>(address_of(t));
-    }
-    reference_wrapper(T&& t) = delete;
+  // construct
+  reference_wrapper(const T &t) { _ptr = const_cast<T *>(address_of(t)); }
+  reference_wrapper(T &&t) = delete;
 
-    // copyable
-    reference_wrapper(const reference_wrapper&) = default;
+  // copyable
+  reference_wrapper(const reference_wrapper &) = default;
 
-    // assignable
-    reference_wrapper& operator=(const reference_wrapper&) = default;
+  // assignable
+  reference_wrapper &operator=(const reference_wrapper &) = default;
 
-    // access
-    T& operator *(){
-        return *_ptr;
-    }
+  // access
+  T &operator*() { return *_ptr; }
 
-    // destroy
-    ~reference_wrapper(){
-        _ptr = nullptr;
-    }
+  // destroy
+  ~reference_wrapper() { _ptr = nullptr; }
+
 private:
-    T* _ptr;
+  T *_ptr;
 };
 
 }; // namespace sql

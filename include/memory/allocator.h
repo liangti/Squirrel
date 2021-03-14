@@ -2,40 +2,40 @@
 #define INCLUDED_MEMORY_ALLOCATOR_H
 #include <memory/utility.h>
 
-namespace sql{
+namespace sql {
 
 class AllocatorImpl;
 
-class AllocatorBase{
+class AllocatorBase {
 private:
-    AllocatorImpl* impl;
+  AllocatorImpl *impl;
+
 public:
-    AllocatorBase();
-    word_t* allocate(size_t);
-    void deallocate(word_t*);
+  AllocatorBase();
+  word_t *allocate(size_t);
+  void deallocate(word_t *);
 };
 
 // allocator interface
-template<typename T>
-class Allocator{
+template <typename T> class Allocator {
 private:
-    int x;
+  int x;
+
 public:
-    AllocatorBase base;
-    virtual T* allocate(size_t size){
-        return (T*)base.allocate(size * sizeof(T));
+  AllocatorBase base;
+  virtual T *allocate(size_t size) {
+    return (T *)base.allocate(size * sizeof(T));
+  }
+  virtual void deallocate(T *t, size_t size) {
+    size_t ptr = 0;
+    // call destructor first;
+    while (ptr != size) {
+      (t + ptr)->~T();
+      ptr++;
     }
-    virtual void deallocate(T* t, size_t size){
-        size_t ptr = 0;
-        // call destructor first;
-        while(ptr != size){
-            (t + ptr)->~T();
-            ptr++;
-        }
-        base.deallocate((word_t*)t);
-    }
-    virtual ~Allocator(){
-    }
+    base.deallocate((word_t *)t);
+  }
+  virtual ~Allocator() {}
 };
 
 }; // namespace sql
