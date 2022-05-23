@@ -15,7 +15,7 @@ private:
   T *ptr;
 
 public:
-  unique_ptr(T *_ptr) : ptr(_ptr) {}
+  explicit unique_ptr(T *_ptr) : ptr(_ptr) {}
 
   template <typename Allocator> unique_ptr(unique_ptr<T, Allocator> &other) {
     ptr = other.ptr;
@@ -51,7 +51,7 @@ private:
   T *ptr;
 
 public:
-  shared_ptr(T *_ptr) : ptr(_ptr), count(new int(1)) {}
+  explicit shared_ptr(T *_ptr) : ptr(_ptr), count(new int(1)) {}
 
   template <typename Allocator> shared_ptr(shared_ptr<T, Allocator> &other) {
     count = other.count;
@@ -96,7 +96,7 @@ private:
   int *count;
 
 public:
-  weak_ptr(shared_ptr<T> &sp) {
+  explicit weak_ptr(shared_ptr<T> &sp) {
     ptr = sp.ptr;
     count = sp.count;
   }

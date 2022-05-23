@@ -114,3 +114,38 @@ TEST(weak_ptr_test, rely_on_shared_pointer_reference_count) {
   shared_ptr<int> sp2 = sp;
   ASSERT_EQ(wp.get_count(), 2);
 }
+
+// test all smart pointer will not implicitly cast to pointer type
+namespace test_cast {
+constexpr int ORIGIN_RETURN_CODE = 100;
+constexpr int UNIQUE_RETURN_CODE = 200;
+constexpr int SHARED_RETURN_CODE = 300;
+constexpr int WEAK_RETURN_CODE = 400;
+int cast(int* x) { return ORIGIN_RETURN_CODE; }
+
+int cast(sql::unique_ptr<int> x) { return UNIQUE_RETURN_CODE; }
+
+int cast(sql::shared_ptr<int> x) { return SHARED_RETURN_CODE; }
+
+int cast(sql::weak_ptr<int> x) { return WEAK_RETURN_CODE; }
+}; // namespace test_cast
+
+TEST(explicit_test, all_smart_pointers) {
+  {
+    int *i = new int(3);
+    ASSERT_EQ(test_cast::cast(i), test_cast::ORIGIN_RETURN_CODE);
+    delete i;
+  }
+  {
+    int *i = new int(3);
+    shared_ptr<int> sp(i);
+    weak_ptr<int> wp(sp);
+    ASSERT_EQ(test_cast::cast(sp), test_cast::SHARED_RETURN_CODE);
+    ASSERT_EQ(test_cast::cast(wp), test_cast::WEAK_RETURN_CODE);
+  }
+  {
+    int *i = new int(3);
+    unique_ptr<int> up(i);
+    ASSERT_EQ(test_cast::cast(up), test_cast::UNIQUE_RETURN_CODE);
+  }
+}
