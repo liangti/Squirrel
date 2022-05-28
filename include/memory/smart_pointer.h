@@ -116,7 +116,7 @@ public:
 };
 
 // array as type is not supported for all smart pointer initializer
-template<class T> struct _Never_true : sql::false_type { };
+template<class T> struct _Never_true : std::false_type { };
 
 template <class T> class unique_ptr<T[]>{
 public:
@@ -134,6 +134,14 @@ public:
   }
 };
 
+template <class T> class unique_ptr<T*>{
+public:
+  template<class... Args>
+  unique_ptr(Args&&... args){
+    static_assert(_Never_true<T>::value, "Pointer as type is not supported");
+  }
+};
+
 template <class T> class shared_ptr<T[]>{
 public:
   template<class... Args>
@@ -147,6 +155,14 @@ public:
   template<class... Args>
   shared_ptr(Args&&... args){
     static_assert(_Never_true<T>::value, "Array as type is not supported");
+  }
+};
+
+template <class T> class shared_ptr<T*>{
+public:
+  template<class... Args>
+  shared_ptr(Args&&... args){
+    static_assert(_Never_true<T>::value, "Pointer as type is not supported");
   }
 };
 

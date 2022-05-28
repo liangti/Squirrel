@@ -155,7 +155,9 @@ TEST(explicit_test, all_smart_pointers) {
 TEST(compile_test, DISABLED_all_smart_pointers){
   sql::unique_ptr<int[]> u1(new int[5]);
   sql::unique_ptr<int[5]> u2(new int[5]);
-  sql::shared_ptr<int[]> u3(new int[5]);
-  sql::shared_ptr<int[5]> u4(new int[5]);
+  sql::unique_ptr<int*> u3(new int(5));
+  sql::shared_ptr<int[]> s1(new int[5]);
+  sql::shared_ptr<int[5]> s2(new int[5]);
+  sql::shared_ptr<int*> s3(new int[5]);
 }
 #endif
