@@ -149,3 +149,13 @@ TEST(explicit_test, all_smart_pointers) {
     ASSERT_EQ(test_cast::cast(up), test_cast::UNIQUE_RETURN_CODE);
   }
 }
+
+// this test is disabled since it will cause compile-time error
+#ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
+TEST(compile_test, DISABLED_all_smart_pointers){
+  sql::unique_ptr<int[]> u1(new int[5]);
+  sql::unique_ptr<int[5]> u2(new int[5]);
+  sql::shared_ptr<int[]> u3(new int[5]);
+  sql::shared_ptr<int[5]> u4(new int[5]);
+}
+#endif

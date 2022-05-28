@@ -1,6 +1,8 @@
 #ifndef INCLUDED_SMART_POINTERS_H
 #define INCLUDED_SMART_POINTERS_H
 
+#include <metaprogramming/types.h>
+
 namespace sql {
 
 class _allocator_base {
@@ -40,6 +42,7 @@ public:
 
   bool is_null() { return ptr == nullptr; }
 };
+
 
 template <typename T> class weak_ptr;
 
@@ -110,6 +113,41 @@ public:
   T *operator->() { return ptr; }
 
   int get_count() { return *count; }
+};
+
+// array as type is not supported for all smart pointer initializer
+template<class T> struct _Never_true : std::false_type { };
+
+template <class T> class unique_ptr<T[]>{
+public:
+  template<class... Args>
+  unique_ptr(Args&&... args){
+    static_assert(_Never_true<T>::value, "Array as type is not supported");
+  }
+};
+
+template <class T, size_t N> class unique_ptr<T[N]>{
+public:
+  template<class... Args>
+  unique_ptr(Args&&... args){
+    static_assert(_Never_true<T>::value, "Array as type is not supported");
+  }
+};
+
+template <class T> class shared_ptr<T[]>{
+public:
+  template<class... Args>
+  shared_ptr(Args&&... args){
+    static_assert(_Never_true<T>::value, "Array as type is not supported");
+  }
+};
+
+template <class T, size_t N> class shared_ptr<T[N]>{
+public:
+  template<class... Args>
+  shared_ptr(Args&&... args){
+    static_assert(_Never_true<T>::value, "Array as type is not supported");
+  }
 };
 
 }; // namespace sql
