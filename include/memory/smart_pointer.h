@@ -5,14 +5,16 @@
 
 namespace sql {
 
-class _allocator_base {
+// by default use delete since unique_ptr has no idea
+// what allocator input pointer is using
+class _deleter_default {
 public:
   template <typename T> static void clean(T *data) { delete data; }
 };
 
 // smart pointers expose to users
 
-template <typename T, class LocalAllocator = _allocator_base> class unique_ptr {
+template <typename T, class Deleter = _deleter_default> class unique_ptr {
 private:
   T *ptr;
 
@@ -26,7 +28,7 @@ public:
     }
   }
   template <typename Allocator>
-  unique_ptr<T, LocalAllocator> &operator=(unique_ptr<T, Allocator> &other) {
+  unique_ptr<T, Deleter> &operator=(unique_ptr<T, Allocator> &other) {
     ptr = other.ptr;
     if (this != &other) {
       other.ptr = nullptr;
@@ -34,7 +36,7 @@ public:
     return *this;
   }
 
-  ~unique_ptr() { LocalAllocator::clean(ptr); }
+  ~unique_ptr() { Deleter::clean(ptr); }
 
   T *operator->() { return ptr; }
 
@@ -46,7 +48,7 @@ public:
 
 template <typename T> class weak_ptr;
 
-template <typename T, class LocalAllocator = _allocator_base> class shared_ptr {
+template <typename T, class Deleter = _deleter_default> class shared_ptr {
   friend weak_ptr<T>;
 
 private:
@@ -74,7 +76,7 @@ public:
   T *operator->() { return ptr; }
 
   template <typename Allocator>
-  shared_ptr<T, LocalAllocator> &operator=(shared_ptr<T, Allocator> &rhs) {
+  shared_ptr<T, Deleter> &operator=(shared_ptr<T, Allocator> &rhs) {
     count = rhs.count;
     ptr = rhs.ptr;
     if (this != &rhs) {
@@ -86,8 +88,8 @@ public:
   T &operator*() { return *ptr; }
 
   void reset() {
-    LocalAllocator::clean(count);
-    LocalAllocator::clean(ptr);
+    Deleter::clean(count);
+    Deleter::clean(ptr);
   }
 
   int get_count() { return *count; }

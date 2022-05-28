@@ -3,13 +3,13 @@
 
 using namespace sql;
 
-class _test_allocator : _allocator_base {
+class _test_allocator : _deleter_default {
 private:
   static size_t _free_size;
 
 public:
   template <typename T> static void clean(T *data) {
-    _allocator_base::clean(data);
+    _deleter_default::clean(data);
     _free_size += sizeof(T);
   }
   static size_t get_free_size() { return _free_size; }
