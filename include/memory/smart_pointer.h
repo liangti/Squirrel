@@ -116,7 +116,7 @@ public:
 };
 
 // array as type is not supported for all smart pointer initializer
-template<class T> struct _Never_true : std::false_type { };
+template<class T> struct _Never_true : sql::false_type { };
 
 template <class T> class unique_ptr<T[]>{
 public:

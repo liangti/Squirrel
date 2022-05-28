@@ -6,10 +6,19 @@
 
 namespace sql {
 
-// same_t check types equivalent
-template <typename T, typename U> struct same_t : std::false_type {};
+// integral constant
+template<class T, T v> struct integral_constant{
+  static constexpr T value = v;
+  using value_type = T;
+};
 
-template <typename T> struct same_t<T, T> : std::true_type {};
+struct true_type : integral_constant<bool, true>{};
+struct false_type : integral_constant<bool, false>{};
+
+// same_t check types equivalent
+template <typename T, typename U> struct same_t : false_type {};
+
+template <typename T> struct same_t<T, T> : true_type {};
 
 // remove_cv extract type from const volatile
 
@@ -42,18 +51,18 @@ template <typename T> struct remove_array<T[]> { using type = T; };
 template <typename T, int N> struct remove_array<T[N]> { using type = T; };
 
 // is_array determine if a type is an array
-template <typename T> struct is_array : std::false_type {};
+template <typename T> struct is_array : false_type {};
 
-template <typename T> struct is_array<T[]> : std::true_type {};
+template <typename T> struct is_array<T[]> : true_type {};
 
-template <typename T, int N> struct is_array<T[N]> : std::true_type {};
+template <typename T, int N> struct is_array<T[N]> : true_type {};
 
 // is_function determine if a type is a function, TODO see cppreference for full
 // support
-template <typename T> struct is_function : std::false_type {};
+template <typename T> struct is_function : false_type {};
 
 template <typename Ret, typename... Args>
-struct is_function<Ret(Args...)> : std::true_type {};
+struct is_function<Ret(Args...)> : true_type {};
 
 // ...
 

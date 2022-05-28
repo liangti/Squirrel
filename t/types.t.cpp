@@ -124,9 +124,9 @@ TEST(test_types, decay_types) {
 }
 
 TEST(test_types, enable_if) {
-  bool t1 = is_array<int>();
-  bool t2 = is_array<int[]>();
-  bool t3 = is_array<int[3]>();
+  bool t1 = is_array_v<int>();
+  bool t2 = is_array_v<int[]>();
+  bool t3 = is_array_v<int[3]>();
   EXPECT_FALSE(t1);
   EXPECT_TRUE(t2);
   EXPECT_TRUE(t3);
