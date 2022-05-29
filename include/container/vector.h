@@ -38,7 +38,7 @@ public:
     }
   }
 
-  ~Vector() { _deallocate(_begin, _capacity); }
+  ~Vector() { _deallocate(_begin); }
 
   inline T *begin() const { return _begin; }
 
@@ -85,7 +85,7 @@ public:
       *current = *previous;
     }
     // delete old stuffs
-    _deallocate(_begin, _capacity);
+    _deallocate(_begin);
     // renew internal settings
     _capacity = new_capacity;
     _begin = new_begin;
@@ -106,8 +106,8 @@ protected:
 
   // TODO: does it work fine with objects with virtual?
   T *_allocate(size_t capacity) { return _allocator.allocate(capacity); }
-  void _deallocate(T *begin, size_t size) {
-    _allocator.deallocate(begin, size);
+  void _deallocate(T *begin) {
+    _allocator.deallocate(begin, 1);
   }
   void _check_size(size_t required) {
     if (required > _capacity) {

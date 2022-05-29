@@ -40,7 +40,7 @@ public:
 
   inline size_t size() { return _count; }
 
-  ~Queue() { _deallocate(_root, _count); }
+  ~Queue() { _deallocate(_root); }
   // do not allow resize
 
 private:
@@ -65,8 +65,8 @@ private:
                                QUEUE_BUFFER); // 2 is for buffer for safe
   }
 
-  void _deallocate(T *begin, size_t size) {
-    _allocator.deallocate(begin, size);
+  void _deallocate(T *begin) {
+    _allocator.deallocate(begin, 1);
   }
 
   inline void _push() {

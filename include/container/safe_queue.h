@@ -16,7 +16,7 @@ public:
 
   ~SafeQueue() {
     std::unique_lock<std::mutex> guard(lock);
-    _deallocate(_root, _capacity);
+    _deallocate(_root);
   }
 
   inline bool empty() { return _count == 0; }
@@ -77,8 +77,8 @@ private:
     return _allocator.allocate(capacity + BUFFER);
   }
 
-  void _deallocate(T *begin, size_t size) {
-    _allocator.deallocate(begin, size);
+  void _deallocate(T *begin) {
+    _allocator.deallocate(begin, 1);
   }
 };
 
@@ -200,8 +200,8 @@ private:
   }
 
   void _deallocate() {
-    _allocator_t.deallocate(_data_root, _capacity);
-    _allocator_s.deallocate(_state_root, _capacity);
+    _allocator_t.deallocate(_data_root, 1);
+    _allocator_s.deallocate(_state_root, 1);
   }
 };
 

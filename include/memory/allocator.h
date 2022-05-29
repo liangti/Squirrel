@@ -27,13 +27,10 @@ public:
     return (T *)base.allocate(size * sizeof(T));
   }
   virtual void deallocate(T *t, size_t size) {
-    size_t ptr = 0;
-    // call destructor first;
-    while (ptr != size) {
-      (t + ptr)->~T();
-      ptr++;
+    for (size_t itr = 0; itr < size; itr++){
+      base.deallocate((word_t *)t);
+      t++;
     }
-    base.deallocate((word_t *)t);
   }
   virtual ~Allocator() {}
 };

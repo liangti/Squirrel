@@ -138,8 +138,8 @@ void String::deallocate(char *data) {
   if (data == nullptr) {
     return;
   }
-  // char* does not need destructor
-  allocator.deallocate(data, 0);
+  // deallocate only 1 block
+  allocator.deallocate(data, 1);
 }
 
 }; // namespace sql
