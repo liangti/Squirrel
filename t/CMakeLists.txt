@@ -7,6 +7,7 @@ configure_file(
 
 foreach(
     TEST
+    memory-utils
     memory-allocator
     smart-pointer
     string-basic
