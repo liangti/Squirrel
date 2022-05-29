@@ -91,9 +91,9 @@ TEST(test_types, remove_array) {
 
 TEST(test_types, is_pointer) {
   bool t1 = sql::is_pointer<int>::value;
-  bool t2 = sql::is_pointer<int&>::value;
-  bool t3 = sql::is_pointer<int*>::value;
-  bool t4 = sql::is_pointer<int**>::value;
+  bool t2 = sql::is_pointer<int &>::value;
+  bool t3 = sql::is_pointer<int *>::value;
+  bool t4 = sql::is_pointer<int **>::value;
   EXPECT_FALSE(t1);
   EXPECT_FALSE(t2);
   EXPECT_TRUE(t3);

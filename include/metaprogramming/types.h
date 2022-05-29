@@ -7,13 +7,13 @@
 namespace sql {
 
 // integral constant
-template<class T, T v> struct integral_constant{
+template <class T, T v> struct integral_constant {
   static constexpr T value = v;
   using value_type = T;
 };
 
-struct true_type : integral_constant<bool, true>{};
-struct false_type : integral_constant<bool, false>{};
+struct true_type : integral_constant<bool, true> {};
+struct false_type : integral_constant<bool, false> {};
 
 // same_t check types equivalent
 template <typename T, typename U> struct same_t : false_type {};
@@ -52,7 +52,7 @@ template <typename T, int N> struct remove_array<T[N]> { using type = T; };
 
 // is_pointer determine if a type is a pointer
 template <typename T> struct is_pointer : false_type {};
-template <typename T> struct is_pointer<T*> : true_type {};
+template <typename T> struct is_pointer<T *> : true_type {};
 
 // is_array determine if a type is an array
 template <typename T> struct is_array : false_type {};

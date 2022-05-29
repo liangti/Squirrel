@@ -46,7 +46,6 @@ public:
   bool is_null() { return ptr == nullptr; }
 };
 
-
 template <typename T> class weak_ptr;
 
 template <typename T, class Deleter = _deleter_default> class shared_ptr {
@@ -119,60 +118,53 @@ public:
 };
 
 // array as type is not supported for all smart pointer initializer
-template<class T> struct _Never_true : std::false_type { };
+template <class T> struct _Never_true : std::false_type {};
 
-template <class T> class unique_ptr<T[]>{
+template <class T> class unique_ptr<T[]> {
 public:
-  template<class... Args>
-  unique_ptr(Args&&... args){
+  template <class... Args> unique_ptr(Args &&...args) {
     static_assert(_Never_true<T>::value, "Array as type is not supported");
   }
 };
 
-template <class T, size_t N> class unique_ptr<T[N]>{
+template <class T, size_t N> class unique_ptr<T[N]> {
 public:
-  template<class... Args>
-  unique_ptr(Args&&... args){
+  template <class... Args> unique_ptr(Args &&...args) {
     static_assert(_Never_true<T>::value, "Array as type is not supported");
   }
 };
 
-template <class T> class unique_ptr<T*>{
+template <class T> class unique_ptr<T *> {
 public:
-  template<class... Args>
-  unique_ptr(Args&&... args){
+  template <class... Args> unique_ptr(Args &&...args) {
     static_assert(_Never_true<T>::value, "Pointer as type is not supported");
   }
 };
 
-template <class T> class shared_ptr<T[]>{
+template <class T> class shared_ptr<T[]> {
 public:
-  template<class... Args>
-  shared_ptr(Args&&... args){
+  template <class... Args> shared_ptr(Args &&...args) {
     static_assert(_Never_true<T>::value, "Array as type is not supported");
   }
 };
 
-template <class T, size_t N> class shared_ptr<T[N]>{
+template <class T, size_t N> class shared_ptr<T[N]> {
 public:
-  template<class... Args>
-  shared_ptr(Args&&... args){
+  template <class... Args> shared_ptr(Args &&...args) {
     static_assert(_Never_true<T>::value, "Array as type is not supported");
   }
 };
 
-template <class T> class shared_ptr<T*>{
+template <class T> class shared_ptr<T *> {
 public:
-  template<class... Args>
-  shared_ptr(Args&&... args){
+  template <class... Args> shared_ptr(Args &&...args) {
     static_assert(_Never_true<T>::value, "Pointer as type is not supported");
   }
 };
 
 // implement make_unique and make_shared
 // make_xxx are all using sql::Allocator to manage memory
-template<class T>
-class _make_deleter {
+template <class T> class _make_deleter {
 
 public:
   static void clean(T *data) {
@@ -181,55 +173,61 @@ public:
   }
 };
 
-template<class T> struct unique_t{
+template <class T> struct unique_t {
   typedef sql::unique_ptr<T, _make_deleter<T>> type;
 };
 
-template<class T> struct unique_t<T[]>{
-  static_assert(_Never_true<T>::value, "make_unique does not support array type");
+template <class T> struct unique_t<T[]> {
+  static_assert(_Never_true<T>::value,
+                "make_unique does not support array type");
 };
 
-template<class T, size_t N> struct unique_t<T[N]>{
-  static_assert(_Never_true<T>::value, "make_unique does not support array type");
+template <class T, size_t N> struct unique_t<T[N]> {
+  static_assert(_Never_true<T>::value,
+                "make_unique does not support array type");
 };
 
-template<class T> struct unique_t<T*>{
-  static_assert(_Never_true<T>::value, "make_unique does not support pointer type");
+template <class T> struct unique_t<T *> {
+  static_assert(_Never_true<T>::value,
+                "make_unique does not support pointer type");
 };
 
-template<class T, class...Args>
-typename unique_t<T>::type make_unique(Args&&... args){
+template <class T, class... Args>
+typename unique_t<T>::type make_unique(Args &&...args) {
   sql::Allocator<T> local_allocator;
-  T* slot = local_allocator.allocate(sizeof(T));
-  T* init = new (slot) T(std::forward<Args>(args)...);
+  T *slot = local_allocator.allocate(sizeof(T));
+  T *init = new (slot) T(std::forward<Args>(args)...);
   return unique_ptr<T, _make_deleter<T>>(init);
 }
 
-template<class T> struct shared_t{
+template <class T> struct shared_t {
   typedef sql::shared_ptr<T, _make_deleter<T>> type;
 };
 
-template<class T> struct shared_t<T[]>{
-  static_assert(_Never_true<T>::value, "make_shared does not support array type");
+template <class T> struct shared_t<T[]> {
+  static_assert(_Never_true<T>::value,
+                "make_shared does not support array type");
 };
 
-template<class T, size_t N> struct shared_t<T[N]>{
-  static_assert(_Never_true<T>::value, "make_shared does not support array type");
+template <class T, size_t N> struct shared_t<T[N]> {
+  static_assert(_Never_true<T>::value,
+                "make_shared does not support array type");
 };
 
-template<class T> struct shared_t<T*>{
-  static_assert(_Never_true<T>::value, "make_shared does not support pointer type");
+template <class T> struct shared_t<T *> {
+  static_assert(_Never_true<T>::value,
+                "make_shared does not support pointer type");
 };
 
-template<class T, class...Args>
-typename shared_t<T>::type make_shared(Args&&... args){
-  // static_assert(sql::is_array<T>::value, "make_shared does not support array type");
+template <class T, class... Args>
+typename shared_t<T>::type make_shared(Args &&...args) {
+  // static_assert(sql::is_array<T>::value, "make_shared does not support array
+  // type");
   sql::Allocator<T> local_allocator;
-  T* slot = local_allocator.allocate(sizeof(T));
-  T* init = new (slot) T(std::forward<Args>(args)...);
+  T *slot = local_allocator.allocate(sizeof(T));
+  T *init = new (slot) T(std::forward<Args>(args)...);
   return shared_ptr<T, _make_deleter<T>>(init);
 }
-
 
 }; // namespace sql
 

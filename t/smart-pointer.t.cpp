@@ -121,7 +121,7 @@ constexpr int ORIGIN_RETURN_CODE = 100;
 constexpr int UNIQUE_RETURN_CODE = 200;
 constexpr int SHARED_RETURN_CODE = 300;
 constexpr int WEAK_RETURN_CODE = 400;
-int cast(int* x) { return ORIGIN_RETURN_CODE; }
+int cast(int *x) { return ORIGIN_RETURN_CODE; }
 
 int cast(sql::unique_ptr<int> x) { return UNIQUE_RETURN_CODE; }
 
@@ -152,34 +152,34 @@ TEST(explicit_test, all_smart_pointers) {
 
 // this test is disabled since it will cause compile-time error
 #ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
-TEST(compile_test, DISABLED_all_smart_pointers){
+TEST(compile_test, DISABLED_all_smart_pointers) {
   sql::unique_ptr<int[]> u1(new int[5]);
   sql::unique_ptr<int[5]> u2(new int[5]);
-  sql::unique_ptr<int*> u3(new int(5));
+  sql::unique_ptr<int *> u3(new int(5));
   sql::shared_ptr<int[]> s1(new int[5]);
   sql::shared_ptr<int[5]> s2(new int[5]);
-  sql::shared_ptr<int*> s3(new int[5]);
+  sql::shared_ptr<int *> s3(new int[5]);
 }
 #endif
 
-TEST(unique_ptr_test, make_unique){
+TEST(unique_ptr_test, make_unique) {
   auto u1 = sql::make_unique<int>(5);
   ASSERT_EQ(*u1, 5);
-  // disable this block since it will cause compile_time error
-  #ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
+// disable this block since it will cause compile_time error
+#ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
   sql::make_unique<int[]>(4);
   sql::make_unique<int[4]>(4);
-  sql::make_unique<int*>(4);
-  #endif
+  sql::make_unique<int *>(4);
+#endif
 }
 
-TEST(shared_ptr_test, make_shared){
+TEST(shared_ptr_test, make_shared) {
   auto s1 = sql::make_shared<int>(5);
   ASSERT_EQ(*s1, 5);
-  // disable this block since it will cause compile_time error
-  #ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
+// disable this block since it will cause compile_time error
+#ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
   sql::make_shared<int[]>(4);
   sql::make_shared<int[4]>(4);
-  sql::make_shared<int*>(4);
-  #endif
+  sql::make_shared<int *>(4);
+#endif
 }
