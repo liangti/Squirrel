@@ -161,3 +161,25 @@ TEST(compile_test, DISABLED_all_smart_pointers){
   sql::shared_ptr<int*> s3(new int[5]);
 }
 #endif
+
+TEST(unique_ptr_test, make_unique){
+  auto u1 = sql::make_unique<int>(5);
+  ASSERT_EQ(*u1, 5);
+  // disable this block since it will cause compile_time error
+  #ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
+  sql::make_unique<int[]>(4);
+  sql::make_unique<int[4]>(4);
+  sql::make_unique<int*>(4);
+  #endif
+}
+
+TEST(shared_ptr_test, make_shared){
+  auto s1 = sql::make_shared<int>(5);
+  ASSERT_EQ(*s1, 5);
+  // disable this block since it will cause compile_time error
+  #ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
+  sql::make_shared<int[]>(4);
+  sql::make_shared<int[4]>(4);
+  sql::make_shared<int*>(4);
+  #endif
+}

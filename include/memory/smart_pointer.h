@@ -1,6 +1,7 @@
 #ifndef INCLUDED_SMART_POINTERS_H
 #define INCLUDED_SMART_POINTERS_H
 
+#include <memory/allocator.h>
 #include <metaprogramming/types.h>
 
 namespace sql {
@@ -21,14 +22,14 @@ private:
 public:
   explicit unique_ptr(T *_ptr) : ptr(_ptr) {}
 
-  template <typename Allocator> unique_ptr(unique_ptr<T, Allocator> &other) {
+  unique_ptr(unique_ptr<T, Deleter> &other) {
     ptr = other.ptr;
     if (this != &other) {
       other.ptr = nullptr;
     }
   }
-  template <typename Allocator>
-  unique_ptr<T, Deleter> &operator=(unique_ptr<T, Allocator> &other) {
+
+  unique_ptr<T, Deleter> &operator=(unique_ptr<T, Deleter> &other) {
     ptr = other.ptr;
     if (this != &other) {
       other.ptr = nullptr;
@@ -167,6 +168,68 @@ public:
     static_assert(_Never_true<T>::value, "Pointer as type is not supported");
   }
 };
+
+// implement make_unique and make_shared
+// make_xxx are all using sql::Allocator to manage memory
+template<class T>
+class _make_deleter {
+
+public:
+  static void clean(T *data) {
+    sql::Allocator<T> allocator;
+    allocator.deallocate(data, sizeof(T));
+  }
+};
+
+template<class T> struct unique_t{
+  typedef sql::unique_ptr<T, _make_deleter<T>> type;
+};
+
+template<class T> struct unique_t<T[]>{
+  static_assert(_Never_true<T>::value, "make_unique does not support array type");
+};
+
+template<class T, size_t N> struct unique_t<T[N]>{
+  static_assert(_Never_true<T>::value, "make_unique does not support array type");
+};
+
+template<class T> struct unique_t<T*>{
+  static_assert(_Never_true<T>::value, "make_unique does not support pointer type");
+};
+
+template<class T, class...Args>
+typename unique_t<T>::type make_unique(Args&&... args){
+  sql::Allocator<T> local_allocator;
+  T* slot = local_allocator.allocate(sizeof(T));
+  T* init = new (slot) T(std::forward<Args>(args)...);
+  return unique_ptr<T, _make_deleter<T>>(init);
+}
+
+template<class T> struct shared_t{
+  typedef sql::shared_ptr<T, _make_deleter<T>> type;
+};
+
+template<class T> struct shared_t<T[]>{
+  static_assert(_Never_true<T>::value, "make_shared does not support array type");
+};
+
+template<class T, size_t N> struct shared_t<T[N]>{
+  static_assert(_Never_true<T>::value, "make_shared does not support array type");
+};
+
+template<class T> struct shared_t<T*>{
+  static_assert(_Never_true<T>::value, "make_shared does not support pointer type");
+};
+
+template<class T, class...Args>
+typename shared_t<T>::type make_shared(Args&&... args){
+  // static_assert(sql::is_array<T>::value, "make_shared does not support array type");
+  sql::Allocator<T> local_allocator;
+  T* slot = local_allocator.allocate(sizeof(T));
+  T* init = new (slot) T(std::forward<Args>(args)...);
+  return shared_ptr<T, _make_deleter<T>>(init);
+}
+
 
 }; // namespace sql
 
