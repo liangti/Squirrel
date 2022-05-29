@@ -221,8 +221,6 @@ template <class T> struct shared_t<T *> {
 
 template <class T, class... Args>
 typename shared_t<T>::type make_shared(Args &&...args) {
-  // static_assert(sql::is_array<T>::value, "make_shared does not support array
-  // type");
   sql::Allocator<T> local_allocator;
   T *slot = local_allocator.allocate(sizeof(T));
   T *init = new (slot) T(std::forward<Args>(args)...);
