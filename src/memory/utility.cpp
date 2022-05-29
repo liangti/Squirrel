@@ -78,7 +78,7 @@ BlockAgent BlockManager::get_head() { return BlockAgent(_block_head); }
 BlockAgent BlockManager::get_top() { return BlockAgent(_block_top); }
 
 void BlockManager::clear() {
-  for (auto itr = _block_head; itr != _block_top; itr++) {
+  for (auto itr = _block_head; itr != _block_top; itr=itr->next) {
     used_clear(itr);
   }
   _memory_size = 0;
@@ -95,6 +95,13 @@ bool BlockManager::safe_check() {
   return true;
 }
 
-size_t BlockViewer::size() { return _memory_size; }
+size_t BlockViewer::memory_size() { return _memory_size; }
 
+size_t BlockViewer::block_number() {
+  size_t count = 0;
+  for (auto itr = _block_head; itr != _block_top; itr=itr->next) {
+    count++;
+  }
+  return count;
+}
 }; // namespace sql

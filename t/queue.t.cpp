@@ -31,7 +31,7 @@ TEST(test_queue, simple_create) {
   ASSERT_EQ(q.front(), 1);
   q.pop();
   EXPECT_TRUE(q.empty());
-  ASSERT_EQ(viewer.size(), align(sizeof(int) * Q_SIZE));
+  ASSERT_EQ(viewer.memory_size(), align(sizeof(int) * Q_SIZE));
 }
 
 TEST(test_queue, cycle_push_pop) {
@@ -56,7 +56,7 @@ TEST(test_queue, cycle_push_pop) {
     ASSERT_EQ(q.front(), i);
     q.pop();
   }
-  ASSERT_EQ(viewer.size(), align(sizeof(int) * Q_SIZE));
+  ASSERT_EQ(viewer.memory_size(), align(sizeof(int) * Q_SIZE));
 }
 
 TEST(test_queue, init_does_not_require_default_constructor) {
@@ -71,7 +71,7 @@ TEST(test_queue, init_does_not_require_default_constructor) {
     q.pop();
   }
   ASSERT_EQ(q.size(), 0);
-  ASSERT_EQ(viewer.size(), align(sizeof(A) * Q_SIZE));
+  ASSERT_EQ(viewer.memory_size(), align(sizeof(A) * Q_SIZE));
 }
 
 TEST(test_queue, emplace_does_no_copy) {
@@ -85,5 +85,5 @@ TEST(test_queue, emplace_does_no_copy) {
     q.pop();
   }
   ASSERT_EQ(q.size(), 0);
-  ASSERT_EQ(viewer.size(), align(sizeof(A) * Q_SIZE));
+  ASSERT_EQ(viewer.memory_size(), align(sizeof(A) * Q_SIZE));
 }

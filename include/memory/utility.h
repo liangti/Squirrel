@@ -52,7 +52,8 @@ manipulation. It only view the memory block status
 class BlockViewer {
 public:
   BlockViewer() = default;
-  size_t size();
+  size_t memory_size();
+  size_t block_number();
 };
 
 }; // namespace sql
