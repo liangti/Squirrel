@@ -9,11 +9,26 @@ using namespace sql;
 
 static BlockViewer viewer;
 
+static int reference_count = 0;
 // no default constructor
 class A {
 public:
-  A(int x) : data(new int(x)) {}
+  A(int x) : data(new int(x)) {
+    reference_count++;
+  }
+  ~A() {
+    reference_count--;
+  }
   A() = delete;
+  A(A&&) = delete;
+  A(const A& other): data(other.data) {
+    reference_count++;
+  } 
+  A &operator=(const A &other){
+    reference_count++;
+    data = other.data;
+    return *this;
+  }
   int *data;
 };
 
@@ -31,6 +46,18 @@ public:
   int *data;
 };
 
+// to ensure vector release resource correctly
+class SafeVectorTest : public ::testing::Test {
+protected:
+  void SetUp() { 
+    reference_count = 0;
+  }
+  void TearDown() {
+    ASSERT_EQ(reference_count, 0);
+    reference_count = 0;
+  }
+};
+
 TEST(test_vector, simple_create_access) {
   Vector<int> v;
   v.push_back(1);
@@ -44,21 +71,24 @@ TEST(test_vector, simple_create_access) {
 }
 
 TEST(test_vector, resize_when_exceed_capacity) {
-  Vector<int> v;
-  size_t test_size = 2000;
-  size_t vector_size = V_SIZE;
-  for (size_t i = 0; i < test_size; i++) {
-    v.push_back(i);
-    // mock resize behavior
-    if (i > vector_size) {
-      vector_size *= 2;
+  {
+    Vector<int> v;
+    size_t test_size = 2000;
+    size_t vector_size = V_SIZE;
+    for (size_t i = 0; i < test_size; i++) {
+      v.push_back(i);
+      // mock resize behavior
+      if (i > vector_size) {
+        vector_size *= 2;
+      }
     }
+    ASSERT_EQ(v.size(), test_size);
+    for (size_t i = 0; i < test_size; i++) {
+      ASSERT_EQ(v[i], i);
+    }
+    ASSERT_EQ(viewer.memory_size(), align(sizeof(int) * vector_size));
   }
-  ASSERT_EQ(v.size(), test_size);
-  for (size_t i = 0; i < test_size; i++) {
-    ASSERT_EQ(v[i], i);
-  }
-  ASSERT_EQ(viewer.memory_size(), align(sizeof(int) * vector_size));
+  ASSERT_EQ(viewer.memory_size(), 0);
 }
 
 TEST(test_vector, initialize_by_initializer_list) {
@@ -141,10 +171,9 @@ TEST(test_vector, emplace_back_compatible_with_normal_item) {
 
 TEST(test_vector, initialize_with_no_default_constructor_object) {
   Vector<A> v;
-  size_t test_size = 2000;
+  size_t test_size = 20;
   for (int i = 0; i < test_size; i++) {
-    A temp(i);
-    v.push_back(temp);
+    v.emplace_back(i);
   }
   ASSERT_EQ(v.size(), test_size);
   for (int i = 0; i < test_size; i++) {
@@ -161,6 +190,19 @@ TEST(test_vector, emplace_back_does_no_copy) {
   for (int i = 0; i < test_size; i++) {
     v.emplace_back(i);
   }
+  ASSERT_EQ(v.size(), test_size);
+  for (int i = 0; i < test_size; i++) {
+    ASSERT_EQ(*(v[i].data), i);
+  }
+}
+
+TEST_F(SafeVectorTest, destructor_is_called){
+  Vector<A> v;
+  size_t test_size = 2000; // explicitly trigger resize
+  for (int i = 0; i < test_size; i++) {
+    v.emplace_back(i);
+  }
+  ASSERT_EQ(reference_count, 2000);
   ASSERT_EQ(v.size(), test_size);
   for (int i = 0; i < test_size; i++) {
     ASSERT_EQ(*(v[i].data), i);

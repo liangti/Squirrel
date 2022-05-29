@@ -3,6 +3,7 @@
 
 #include <initializer_list>
 #include <memory/allocator.h>
+#include <memory/destroy.h>
 
 namespace sql {
 
@@ -107,6 +108,7 @@ protected:
   // TODO: does it work fine with objects with virtual?
   T *_allocate(size_t capacity) { return _allocator.allocate(capacity); }
   void _deallocate(T *begin) {
+    destroy_n(begin, _top);
     _allocator.deallocate(begin, 1);
   }
   void _check_size(size_t required) {
