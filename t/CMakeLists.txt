@@ -9,6 +9,7 @@ foreach(
     TEST
     memory-utils
     memory-allocator
+    destroy
     smart-pointer
     string-basic
     threadpool
