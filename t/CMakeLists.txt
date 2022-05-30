@@ -10,6 +10,7 @@ foreach(
     memory-utils
     memory-allocator
     destroy
+    function
     smart-pointer
     string-basic
     threadpool
