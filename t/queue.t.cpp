@@ -102,10 +102,10 @@ TEST(test_queue, emplace_does_no_copy) {
 TEST(test_queue, call_destructor_and_free_memory){
   {
     Queue<C> q(50);
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 40; i++) {
       q.emplace(i);
     }
-    ASSERT_EQ(reference_count, 50);
+    ASSERT_EQ(reference_count, 40); // there are only 40 items
   }
   ASSERT_EQ(viewer.memory_size(), 0);
   ASSERT_EQ(reference_count, 0);
