@@ -25,6 +25,17 @@ public:
   int *data;
 };
 
+static int reference_count = 0;
+class C{
+public:
+  C(int x) : data(new int(x)) { reference_count++; }
+  ~C() { 
+    reference_count--;
+    delete data;
+  }
+  int *data;
+};
+
 TEST(test_queue, simple_create) {
   Queue<int> q;
   q.push(1);
@@ -86,4 +97,16 @@ TEST(test_queue, emplace_does_no_copy) {
   }
   ASSERT_EQ(q.size(), 0);
   ASSERT_EQ(viewer.memory_size(), align(sizeof(A) * Q_SIZE));
+}
+
+TEST(test_queue, call_destructor_and_free_memory){
+  {
+    Queue<C> q(50);
+    for (int i = 0; i < 50; i++) {
+      q.emplace(i);
+    }
+    ASSERT_EQ(reference_count, 50);
+  }
+  ASSERT_EQ(viewer.memory_size(), 0);
+  ASSERT_EQ(reference_count, 0);
 }

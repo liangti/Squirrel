@@ -7,6 +7,7 @@
 #define BUFFER 10000
 
 #include <memory/allocator.h>
+#include <memory/destroy.h>
 #include <utility>
 
 namespace sql {
@@ -66,6 +67,7 @@ private:
   }
 
   void _deallocate(T *begin) {
+    destroy_n(begin, _count);
     _allocator.deallocate(begin, 1);
   }
 
