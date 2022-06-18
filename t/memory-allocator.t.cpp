@@ -57,7 +57,6 @@ TEST_F(MemoryAllocatorTest, reuse_block) {
 
 TEST_F(MemoryAllocatorTest, find_free_block_skip_too_large_block) {
   auto data = obj_allocator.allocate(2);
-  Block *block = get_header((word_t *)data);
   ASSERT_EQ(viewer.memory_size(), align(sizeof(TestObj) * 2));
   obj_allocator.deallocate(data, 1);
   data = obj_allocator.allocate(1);

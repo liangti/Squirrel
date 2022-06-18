@@ -3,7 +3,9 @@
 
 using namespace sql;
 
-TEST(test_tuple, construct_empty_tuple) { Tuple<> empty; }
+TEST(test_tuple, construct_empty_tuple) { 
+  [[maybe_unused]] Tuple<> empty;
+}
 
 TEST(test_tuple, construct_simple_tuple) {
   Tuple<char, int, double> tuple('a', 1, 0.3);

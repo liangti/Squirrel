@@ -52,8 +52,8 @@ template <typename T, class Deleter = _deleter_default> class shared_ptr {
   friend weak_ptr<T>;
 
 private:
-  int *count;
   T *ptr;
+  int *count;
 
 public:
   explicit shared_ptr(T *_ptr) : ptr(_ptr), count(new int(1)) {}

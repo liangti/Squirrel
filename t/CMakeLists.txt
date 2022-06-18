@@ -41,6 +41,7 @@ foreach(
         ${USER_LIBS_DIR}/libgmock.a
         ${USER_LIBS_DIR}/libgmock_main.a
     )
+    target_compile_options(${TEST}.t PRIVATE -Wall -Werror)
     add_test(
         NAME ${TEST}
         COMMAND ${TEST}.t

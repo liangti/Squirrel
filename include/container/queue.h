@@ -35,7 +35,7 @@ public:
   }
 
   template <typename... Args> void emplace(Args &&...args) {
-    T *current = new (_root + _tail) T(std::forward<Args>(args)...);
+    [[maybe_unused]]T *current = new (_root + _tail) T(std::forward<Args>(args)...);
     _push();
   }
 

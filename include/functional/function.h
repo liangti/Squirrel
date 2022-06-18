@@ -5,7 +5,7 @@
 
 namespace sql {
 
-template <typename> struct function;
+template <typename> class function;
 
 template <class Return, class... Args> class function<Return(Args...)> {
 public:
@@ -24,6 +24,7 @@ public:
 private:
   struct CallableBase {
     virtual Return invoke(Args &&...args) = 0;
+    virtual ~CallableBase() = default;
   };
   template <typename FS> struct CallableImpl : public CallableBase {
     CallableImpl(const FS &fs) : fp(fs) {}

@@ -68,7 +68,7 @@ public:
   template <typename... Args> void emplace_back(Args &&...args) {
     _check_size(_top + 1);
     // placement new is to create an object in existing address space
-    T *current = new (_begin + _top) T(std::forward<Args>(args)...);
+    [[maybe_unused]] T *current = new (_begin + _top) T(std::forward<Args>(args)...);
     _top++;
   }
 

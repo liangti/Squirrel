@@ -21,9 +21,9 @@ TEST(test_string_utils, strlen) {
 }
 
 TEST(test_string_utils, strcmp) {
-  char *a = "abc";
-  char *b = "abedf";
-  char *c = "abc";
+  const char *a = "abc";
+  const char *b = "abedf";
+  const char *c = "abc";
   EXPECT_TRUE(_strncmp(a, b, 0));
   EXPECT_TRUE(_strncmp(a, b, 1));
   EXPECT_TRUE(_strncmp(a, b, 2));
@@ -78,6 +78,13 @@ TEST(test_string_basic, move_assignment) {
   ASSERT_EQ(viewer.memory_size(), align(3));
 }
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#elif __GNUC__
+#pragma gcc diagnostic push
+#pragma gcc diagnostic ignored "-Wself-assign-overloaded"
+#endif
 TEST(test_string_basic, copy_self_assignment) {
   String s("abc");
   s = s;
@@ -85,7 +92,19 @@ TEST(test_string_basic, copy_self_assignment) {
   ASSERT_EQ(s.size(), 3);
   ASSERT_EQ(viewer.memory_size(), align(3));
 }
+#ifdef __clang__
+#pragma clang diagnostic pop
+#elif __GNUC__
+#pragma gcc diagnostic pop
+#endif
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-move"
+#elif __GNUC__
+#pragma gcc diagnostic push
+#pragma gcc diagnostic ignored "-Wself-assign-overloaded"
+#endif
 TEST(test_string_basic, move_self_assignment) {
   String s("abc");
   s = std::move(s);
@@ -93,6 +112,11 @@ TEST(test_string_basic, move_self_assignment) {
   ASSERT_EQ(s.size(), 3);
   ASSERT_EQ(viewer.memory_size(), align(3));
 }
+#ifdef __clang__
+#pragma clang diagnostic pop
+#elif __GNUC__
+#pragma gcc diagnostic pop
+#endif
 
 TEST(test_string_basic, string_concatenation) {
   String a("abc");

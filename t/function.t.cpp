@@ -10,7 +10,7 @@ struct Functor {
 };
 
 TEST(function_test, release_empty_callable) {
-  { function<void(int *)> fp; }
+  { [[maybe_unused]] function<void(int *)> fp; }
 }
 
 TEST(function_test, function_pointer) {
@@ -22,7 +22,6 @@ TEST(function_test, function_pointer) {
 }
 
 TEST(function_test, lambda) {
-  auto f = [](int *i) { (*i)++; };
   function<void(int *)> fp;
   fp = add_one;
   int local = 3;
