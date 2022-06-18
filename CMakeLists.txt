@@ -15,6 +15,8 @@ add_library(
     src/thread/threadpool.cpp
 )
 
+target_compile_options(squirrel PRIVATE -fno-exceptions)
+
 target_include_directories(
     squirrel
     PRIVATE
