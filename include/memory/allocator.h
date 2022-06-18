@@ -23,7 +23,7 @@ private:
 
 public:
   AllocatorBase base;
-  virtual T *allocate(size_t size) {
+  [[nodiscard("Memory leak")]] virtual T *allocate(size_t size) {
     return (T *)base.allocate(size * sizeof(T));
   }
   virtual void deallocate(T *t, size_t size) {
