@@ -137,6 +137,12 @@ private:
   T *_ptr;
 };
 
+// nothrow
+template <class Fp, class... Args>
+struct is_nothrow_constructible
+    : public std::integral_constant<bool,
+                                    noexcept(Fp(std::declval<Args>()...))> {};
+
 }; // namespace sql
 
 #endif

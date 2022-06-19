@@ -181,3 +181,25 @@ TEST(test_types, reference_wrapper) {
   i = 3;
   ASSERT_EQ(*i1, 3);
 }
+
+class NoThrow {
+private:
+  [[maybe_unused]] int data;
+
+public:
+  NoThrow() {}
+  NoThrow(int data) noexcept : data(data) {}
+  NoThrow(const NoThrow &copy) { throw 1; }
+  NoThrow(NoThrow &&move) noexcept {}
+};
+
+TEST(test_types, is_nothrow_constructible) {
+  bool a = is_nothrow_constructible<NoThrow>::value;
+  bool b = is_nothrow_constructible<NoThrow, int>::value;
+  bool c = is_nothrow_constructible<NoThrow, const NoThrow &>::value;
+  bool d = is_nothrow_constructible<NoThrow, NoThrow &&>::value;
+  EXPECT_FALSE(a);
+  EXPECT_TRUE(b);
+  EXPECT_FALSE(c);
+  EXPECT_TRUE(d);
+}
