@@ -55,3 +55,10 @@ TEST(test_tuple, tie){
   ASSERT_EQ(a, 1);
   ASSERT_EQ(b, 2);
 }
+
+TEST(test_tuple, ignore){
+  auto tuple = make_tuple(100, 2);
+  int a;
+  tie(a, ignore) = tuple;
+  ASSERT_EQ(a, 100);
+}

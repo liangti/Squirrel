@@ -2,12 +2,20 @@
 #define INCLUDED_TUPLE_H
 
 #include <functional>
+#include <metaprogramming/types.h>
 
 namespace sqrl {
 
 // Tuple
 
 template <typename... Ts> class Tuple {};
+
+struct ignore_t{
+  template<typename T>
+  constexpr void operator=(const T&) const{
+    // do nothing
+  }
+};
 
 template <typename T, typename... Ts> class Tuple<T, Ts...> {
 public:
@@ -17,7 +25,9 @@ public:
 
   template<typename... Args>
   Tuple& operator=(const Tuple<Args...>& other){
-    head = other.head;
+    if constexpr(!sqrl::same_t<T, ignore_t>::value){
+      head = other.head;
+    }
     tail = other.tail;
     return (*this);
   }
@@ -43,7 +53,7 @@ public:
 // get method
 
 template <int idx, template <typename...> class Tuple, typename... Args>
-auto get(Tuple<Args...> &tuple) {
+constexpr auto get(Tuple<Args...> &tuple) {
   return _TupleGet<idx, Tuple<Args...>>::get(tuple);
 }
 
@@ -51,7 +61,7 @@ auto get(Tuple<Args...> &tuple) {
 template <class Tuple> int size(Tuple &tuple) { return 0; }
 
 template <template <typename...> class Tuple, typename t, typename... ts>
-int size(Tuple<t, ts...> &tuple) {
+constexpr int size(Tuple<t, ts...> &tuple) {
   return 1 + size(tuple.tail);
 }
 
@@ -74,9 +84,12 @@ template <typename... Args> auto make_tuple(Args &&...args) {
 
 // tie
 template <typename... Args>
-Tuple<Args&...> tie(Args&... args){
+constexpr Tuple<Args&...> tie(Args&... args){
   return {args...};
 }
+
+// ignore
+inline constexpr ignore_t ignore; // inline for avoiding ODR
 
 }; // namespace sqrl
 
