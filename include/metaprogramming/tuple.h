@@ -14,6 +14,13 @@ public:
   T head;
   Tuple<Ts...> tail;
   Tuple(const T &t, const Ts &...ts) : head(t), tail(ts...) {}
+
+  template<typename... Args>
+  Tuple& operator=(const Tuple<Args...>& other){
+    head = other.head;
+    tail = other.tail;
+    return (*this);
+  }
 };
 
 // _TupleGet
@@ -63,6 +70,12 @@ using special_decay_t =
 
 template <typename... Args> auto make_tuple(Args &&...args) {
   return Tuple<special_decay_t<Args>...>(std::forward<Args>(args)...);
+}
+
+// tie
+template <typename... Args>
+Tuple<Args&...> tie(Args&... args){
+  return {args...};
 }
 
 }; // namespace sqrl

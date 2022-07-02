@@ -38,3 +38,20 @@ TEST(test_tuple, make_tuple) {
   ASSERT_EQ(get<1>(tuple), 1);
   ASSERT_EQ(get<2>(tuple), 3);
 }
+
+TEST(test_tuple, other_type_copy){
+  int a = 1;
+  Tuple<int&> t1(a);
+  Tuple<int> t2(3);
+  t1 = t2;
+  ASSERT_EQ(a, 3);
+}
+
+TEST(test_tuple, tie){
+  auto tuple = make_tuple(1, 2);
+  int a;
+  int b;
+  tie(a, b) = tuple;
+  ASSERT_EQ(a, 1);
+  ASSERT_EQ(b, 2);
+}
