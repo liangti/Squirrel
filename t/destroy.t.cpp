@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory/destroy.h>
 
-using namespace sql;
+using namespace sqrl;
 
 int reference_count = 0;
 class TestObj{

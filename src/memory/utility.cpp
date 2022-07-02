@@ -1,6 +1,6 @@
 #include <memory/utility.h>
 
-namespace sql {
+namespace sqrl {
 
 extern "C" {
 Block *_block_head = nullptr;
@@ -104,4 +104,4 @@ size_t BlockViewer::block_number() {
   }
   return count;
 }
-}; // namespace sql
+}; // namespace sqrl

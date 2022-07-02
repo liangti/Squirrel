@@ -1,7 +1,7 @@
 #include <memory/allocator.h>
 #include <memory/utility.h>
 
-namespace sql {
+namespace sqrl {
 
 class AllocatorImpl {
 private:
@@ -44,4 +44,4 @@ word_t *AllocatorBase::allocate(size_t size) { return impl->allocate(size); }
 
 void AllocatorBase::deallocate(word_t *p) { impl->deallocate(p); }
 
-}; // namespace sql
+}; // namespace sqrl

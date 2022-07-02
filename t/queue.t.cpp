@@ -5,7 +5,7 @@
 // queue has a buffer when allocating memory
 #define Q_SIZE 52
 
-using namespace sql;
+using namespace sqrl;
 
 static BlockViewer viewer;
 

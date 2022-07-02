@@ -5,7 +5,7 @@
 #include <memory/allocator.h>
 #include <memory/destroy.h>
 
-namespace sql {
+namespace sqrl {
 
 template <typename T> class Vector {
 public:
@@ -93,7 +93,7 @@ public:
   }
 
 protected:
-  sql::Allocator<T> _allocator;
+  sqrl::Allocator<T> _allocator;
   size_t _capacity;
   size_t _top;
   T *_begin;
@@ -118,6 +118,6 @@ protected:
   }
 };
 
-}; // namespace sql
+}; // namespace sqrl
 
 #endif

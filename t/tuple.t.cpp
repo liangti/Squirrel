@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <metaprogramming/tuple.h>
 
-using namespace sql;
+using namespace sqrl;
 
 TEST(test_tuple, construct_empty_tuple) { 
   [[maybe_unused]] Tuple<> empty;

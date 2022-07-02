@@ -5,7 +5,7 @@
 
 #define V_SIZE 50
 
-using namespace sql;
+using namespace sqrl;
 
 static BlockViewer viewer;
 
@@ -156,7 +156,7 @@ TEST(test_vector, pointer_element) {
 // vector may not have initialize at the very beginning
 
 // TEST(test_vector, reference_element){
-//     Vector<sql::reference_wrapper<int>> v;
+//     Vector<sqrl::reference_wrapper<int>> v;
 //     int i = 3;
 //     v.push_back(i);
 //     ASSERT_EQ(v[0], 1);

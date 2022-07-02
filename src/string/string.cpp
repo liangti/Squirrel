@@ -1,6 +1,6 @@
 #include <string/string.h>
 
-namespace sql {
+namespace sqrl {
 
 static const int _strcmp_max = 100; // strcmp max length
 
@@ -142,4 +142,4 @@ void String::deallocate(char *data) {
   allocator.deallocate(data, 1);
 }
 
-}; // namespace sql
+}; // namespace sqrl

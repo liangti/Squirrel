@@ -2,7 +2,7 @@
 #define INCLUDED_STRING_H
 
 #include <memory/allocator.h>
-namespace sql {
+namespace sqrl {
 
 void _strcpy(char *, const char *);
 unsigned int _strlen(const char *);
@@ -25,11 +25,11 @@ public:
 private:
   char *s_data;
   size_t s_len;
-  sql::Allocator<char> allocator;
+  sqrl::Allocator<char> allocator;
   char *allocate(size_t);
   void deallocate(char *);
 };
 
-}; // namespace sql
+}; // namespace sqrl
 
 #endif

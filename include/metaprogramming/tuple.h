@@ -3,7 +3,7 @@
 
 #include <functional>
 
-namespace sql {
+namespace sqrl {
 
 // Tuple
 
@@ -65,6 +65,6 @@ template <typename... Args> auto make_tuple(Args &&...args) {
   return Tuple<special_decay_t<Args>...>(std::forward<Args>(args)...);
 }
 
-}; // namespace sql
+}; // namespace sqrl
 
 #endif

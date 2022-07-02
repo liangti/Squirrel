@@ -8,7 +8,7 @@
 
 #define MAX_QUEUE_NUM 50
 
-namespace sql {
+namespace sqrl {
 
 template <typename T> class SafeQueue : Queue<T> {
 public:
@@ -62,7 +62,7 @@ private:
   std::atomic<size_t> _count;
   std::atomic<size_t> _capacity;
   std::mutex lock;
-  sql::Allocator<T> _allocator;
+  sqrl::Allocator<T> _allocator;
 
   void _init_space(size_t capacity) {
     _capacity = capacity;
@@ -182,8 +182,8 @@ private:
   std::atomic<size_t> _capacity;
   T *_data_root;
   State *_state_root;
-  sql::Allocator<T> _allocator_t;
-  sql::Allocator<State> _allocator_s;
+  sqrl::Allocator<T> _allocator_t;
+  sqrl::Allocator<State> _allocator_s;
 
   void _init_space(size_t capacity) {
     _capacity = capacity;
@@ -205,5 +205,5 @@ private:
   }
 };
 
-} // namespace sql
+} // namespace sqrl
 #endif

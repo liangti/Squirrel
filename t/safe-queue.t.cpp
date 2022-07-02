@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <thread>
 
-using namespace sql;
+using namespace sqrl;
 
 static const int MAX_LOOP_NUM = 10; // TODO: raise the loop number to 100
 

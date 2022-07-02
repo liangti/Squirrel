@@ -4,7 +4,7 @@
 #include <map>
 #include <memory/block.h>
 
-namespace sql {
+namespace sqrl {
 
 using BlockData = word_t;
 
@@ -56,6 +56,6 @@ public:
   size_t block_number();
 };
 
-}; // namespace sql
+}; // namespace sqrl
 
 #endif

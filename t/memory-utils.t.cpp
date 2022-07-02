@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory/utility.h>
 
-using namespace sql;
+using namespace sqrl;
 struct TestObj {
   int x;
   int y;

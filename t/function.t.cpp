@@ -1,7 +1,7 @@
 #include <functional/function.h>
 #include <gtest/gtest.h>
 
-using namespace sql;
+using namespace sqrl;
 
 void add_one(int *i) { (*i)++; }
 

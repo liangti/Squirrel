@@ -3,7 +3,7 @@
 
 #include <memory/block.h>
 
-namespace sql{
+namespace sqrl{
 
 template<class T>
 void destroy_at(T* ptr){

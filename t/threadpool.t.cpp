@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <thread/threadpool.h>
 
-using namespace sql;
+using namespace sqrl;
 
 static const int MAX_LOOP_NUM = 10;
 

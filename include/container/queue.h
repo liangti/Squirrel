@@ -10,7 +10,7 @@
 #include <memory/destroy.h>
 #include <utility>
 
-namespace sql {
+namespace sqrl {
 
 template <typename T> class Queue {
 public:
@@ -50,7 +50,7 @@ private:
   size_t _tail;
   size_t _count;
   size_t _capacity;
-  sql::Allocator<T> _allocator;
+  sqrl::Allocator<T> _allocator;
 
   void _init_space(size_t capacity) {
     _capacity = capacity;
@@ -82,6 +82,6 @@ private:
   }
 };
 
-}; // namespace sql
+}; // namespace sqrl
 
 #endif

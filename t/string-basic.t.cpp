@@ -3,7 +3,7 @@
 #include <memory/utility.h>
 #include <string/string.h>
 
-using namespace sql;
+using namespace sqrl;
 
 static BlockViewer viewer;
 

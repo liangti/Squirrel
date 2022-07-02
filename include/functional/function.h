@@ -3,7 +3,7 @@
 
 #include <utility>
 
-namespace sql {
+namespace sqrl {
 
 template <typename> class function;
 
@@ -36,5 +36,5 @@ private:
   CallableBase *callable = nullptr;
 };
 
-}; // end of namespace sql
+}; // end of namespace sqrl
 #endif

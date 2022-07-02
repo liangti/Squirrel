@@ -2,7 +2,7 @@
 #define INCLUDED_MEMORY_ALLOCATOR_H
 #include <memory/utility.h>
 
-namespace sql {
+namespace sqrl {
 
 class AllocatorImpl;
 
@@ -35,6 +35,6 @@ public:
   virtual ~Allocator() {}
 };
 
-}; // namespace sql
+}; // namespace sqrl
 
 #endif

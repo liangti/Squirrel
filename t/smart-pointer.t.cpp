@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory/smart_pointer.h>
 
-using namespace sql;
+using namespace sqrl;
 
 class _test_allocator : _deleter_default {
 private:
@@ -123,11 +123,11 @@ constexpr int SHARED_RETURN_CODE = 300;
 constexpr int WEAK_RETURN_CODE = 400;
 int cast(int *x) { return ORIGIN_RETURN_CODE; }
 
-int cast(sql::unique_ptr<int> x) { return UNIQUE_RETURN_CODE; }
+int cast(sqrl::unique_ptr<int> x) { return UNIQUE_RETURN_CODE; }
 
-int cast(sql::shared_ptr<int> x) { return SHARED_RETURN_CODE; }
+int cast(sqrl::shared_ptr<int> x) { return SHARED_RETURN_CODE; }
 
-int cast(sql::weak_ptr<int> x) { return WEAK_RETURN_CODE; }
+int cast(sqrl::weak_ptr<int> x) { return WEAK_RETURN_CODE; }
 }; // namespace test_cast
 
 TEST(explicit_test, all_smart_pointers) {
@@ -153,33 +153,33 @@ TEST(explicit_test, all_smart_pointers) {
 // this test is disabled since it will cause compile-time error
 #ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
 TEST(compile_test, DISABLED_all_smart_pointers) {
-  sql::unique_ptr<int[]> u1(new int[5]);
-  sql::unique_ptr<int[5]> u2(new int[5]);
-  sql::unique_ptr<int *> u3(new int(5));
-  sql::shared_ptr<int[]> s1(new int[5]);
-  sql::shared_ptr<int[5]> s2(new int[5]);
-  sql::shared_ptr<int *> s3(new int[5]);
+  sqrl::unique_ptr<int[]> u1(new int[5]);
+  sqrl::unique_ptr<int[5]> u2(new int[5]);
+  sqrl::unique_ptr<int *> u3(new int(5));
+  sqrl::shared_ptr<int[]> s1(new int[5]);
+  sqrl::shared_ptr<int[5]> s2(new int[5]);
+  sqrl::shared_ptr<int *> s3(new int[5]);
 }
 #endif
 
 TEST(unique_ptr_test, make_unique) {
-  auto u1 = sql::make_unique<int>(5);
+  auto u1 = sqrl::make_unique<int>(5);
   ASSERT_EQ(*u1, 5);
 // disable this block since it will cause compile_time error
 #ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
-  sql::make_unique<int[]>(4);
-  sql::make_unique<int[4]>(4);
-  sql::make_unique<int *>(4);
+  sqrl::make_unique<int[]>(4);
+  sqrl::make_unique<int[4]>(4);
+  sqrl::make_unique<int *>(4);
 #endif
 }
 
 TEST(shared_ptr_test, make_shared) {
-  auto s1 = sql::make_shared<int>(5);
+  auto s1 = sqrl::make_shared<int>(5);
   ASSERT_EQ(*s1, 5);
 // disable this block since it will cause compile_time error
 #ifdef __SQL_TEST_EXPECT_COMPILE_TIME_FAILURE
-  sql::make_shared<int[]>(4);
-  sql::make_shared<int[4]>(4);
-  sql::make_shared<int *>(4);
+  sqrl::make_shared<int[]>(4);
+  sqrl::make_shared<int[4]>(4);
+  sqrl::make_shared<int *>(4);
 #endif
 }

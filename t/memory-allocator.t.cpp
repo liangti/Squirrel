@@ -2,7 +2,7 @@
 #include <memory/allocator.h>
 #include <memory/utility.h>
 
-using namespace sql;
+using namespace sqrl;
 class TestObj {
 public:
   int x;

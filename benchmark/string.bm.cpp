@@ -3,7 +3,7 @@
 
 static void SQL_StringCreate(benchmark::State& state) {
   for (auto _ : state)
-    sql::String str("hi");
+    sqrl::String str("hi");
 }
 
 static void STD_StringCreate(benchmark::State& state) {
@@ -12,9 +12,9 @@ static void STD_StringCreate(benchmark::State& state) {
 }
 
 static void SQL_StringCopy(benchmark::State& state) {
-  sql::String x("hello");
+  sqrl::String x("hello");
   for (auto _ : state)
-    sql::String copy(x);
+    sqrl::String copy(x);
 }
 
 static void STD_StringCopy(benchmark::State& state) {

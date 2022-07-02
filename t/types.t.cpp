@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-using namespace sql;
+using namespace sqrl;
 
 // for testing enable_if
 template <typename T>
@@ -46,10 +46,10 @@ TEST(test_types, check_type_equivalent) {
 }
 
 TEST(test_types, remove_const_and_volatile) {
-  bool t1 = same_t<int, sql::remove_cv<int>::type>::value;
-  bool t2 = same_t<int, sql::remove_cv<const int>::type>::value;
-  bool t3 = same_t<int, sql::remove_cv<volatile int>::type>::value;
-  bool t4 = same_t<int, sql::remove_cv<const volatile int>::type>::value;
+  bool t1 = same_t<int, sqrl::remove_cv<int>::type>::value;
+  bool t2 = same_t<int, sqrl::remove_cv<const int>::type>::value;
+  bool t3 = same_t<int, sqrl::remove_cv<volatile int>::type>::value;
+  bool t4 = same_t<int, sqrl::remove_cv<const volatile int>::type>::value;
   EXPECT_TRUE(t1);
   EXPECT_TRUE(t2);
   EXPECT_TRUE(t3);
@@ -57,8 +57,8 @@ TEST(test_types, remove_const_and_volatile) {
 }
 
 TEST(test_types, conditional_choose_types) {
-  using type1 = sql::conditional<true, int, double>::type;
-  using type2 = sql::conditional<false, int, double>::type;
+  using type1 = sqrl::conditional<true, int, double>::type;
+  using type2 = sqrl::conditional<false, int, double>::type;
   bool t1 = same_t<type1, int>::value;
   bool t2 = same_t<type2, double>::value;
   EXPECT_TRUE(t1);
@@ -66,9 +66,9 @@ TEST(test_types, conditional_choose_types) {
 }
 
 TEST(test_types, remove_reference) {
-  using type1 = sql::remove_reference<int>::type;
-  using type2 = sql::remove_reference<int &>::type;
-  using type3 = sql::remove_reference<int &&>::type;
+  using type1 = sqrl::remove_reference<int>::type;
+  using type2 = sqrl::remove_reference<int &>::type;
+  using type3 = sqrl::remove_reference<int &&>::type;
   bool t1 = same_t<type1, int>::value;
   bool t2 = same_t<type2, int>::value;
   bool t3 = same_t<type3, int>::value;
@@ -78,9 +78,9 @@ TEST(test_types, remove_reference) {
 }
 
 TEST(test_types, remove_array) {
-  using type1 = sql::remove_array<int>::type;
-  using type2 = sql::remove_array<int[]>::type;
-  using type3 = sql::remove_array<int[3]>::type;
+  using type1 = sqrl::remove_array<int>::type;
+  using type2 = sqrl::remove_array<int[]>::type;
+  using type3 = sqrl::remove_array<int[3]>::type;
   bool t1 = same_t<type1, int>::value;
   bool t2 = same_t<type2, int>::value;
   bool t3 = same_t<type3, int>::value;
@@ -90,10 +90,10 @@ TEST(test_types, remove_array) {
 }
 
 TEST(test_types, is_pointer) {
-  bool t1 = sql::is_pointer<int>::value;
-  bool t2 = sql::is_pointer<int &>::value;
-  bool t3 = sql::is_pointer<int *>::value;
-  bool t4 = sql::is_pointer<int **>::value;
+  bool t1 = sqrl::is_pointer<int>::value;
+  bool t2 = sqrl::is_pointer<int &>::value;
+  bool t3 = sqrl::is_pointer<int *>::value;
+  bool t4 = sqrl::is_pointer<int **>::value;
   EXPECT_FALSE(t1);
   EXPECT_FALSE(t2);
   EXPECT_TRUE(t3);
@@ -101,27 +101,27 @@ TEST(test_types, is_pointer) {
 }
 
 TEST(test_types, is_array) {
-  bool t1 = sql::is_array<int>::value;
-  bool t2 = sql::is_array<int[]>::value;
-  bool t3 = sql::is_array<int[3]>::value;
+  bool t1 = sqrl::is_array<int>::value;
+  bool t2 = sqrl::is_array<int[]>::value;
+  bool t3 = sqrl::is_array<int[3]>::value;
   EXPECT_FALSE(t1);
   EXPECT_TRUE(t2);
   EXPECT_TRUE(t3);
 }
 
 TEST(test_types, is_function) {
-  bool t1 = sql::is_function<int>::value;
-  bool t2 = sql::is_function<int(int)>::value;
+  bool t1 = sqrl::is_function<int>::value;
+  bool t2 = sqrl::is_function<int(int)>::value;
   EXPECT_FALSE(t1);
   EXPECT_TRUE(t2);
 }
 
 TEST(test_types, decay_types) {
-  using type1 = sql::decay<int &>::type;
-  using type2 = sql::decay<int &&>::type;
-  using type3 = sql::decay<const int>::type;
-  using type4 = sql::decay<int[]>::type;
-  using type5 = sql::decay<int(int)>::type;
+  using type1 = sqrl::decay<int &>::type;
+  using type2 = sqrl::decay<int &&>::type;
+  using type3 = sqrl::decay<const int>::type;
+  using type4 = sqrl::decay<int[]>::type;
+  using type5 = sqrl::decay<int(int)>::type;
   bool t1 = same_t<type1, int>::value;
   bool t2 = same_t<type2, int>::value;
   bool t3 = same_t<type3, int>::value;
@@ -165,7 +165,7 @@ TEST(test_types, address_of) {
 }
 
 TEST(test_types, reference_wrapper) {
-  // try std::reference_wrapper, not support in sql::reference_wrapper yet
+  // try std::reference_wrapper, not support in sqrl::reference_wrapper yet
   std::vector<int> v1{1, 2, 3};
   std::vector<int> v2{v1.begin(), v1.end()};
   std::vector<std::reference_wrapper<int>> v3{v1.begin(), v1.end()};
@@ -175,8 +175,8 @@ TEST(test_types, reference_wrapper) {
   ASSERT_EQ(v3[0], 100);
 
   int i = 1;
-  sql::reference_wrapper<int> i1(i); // lvalue
-  // sql::reference_wrapper<int> i2(1); // rvalue is not allowed
+  sqrl::reference_wrapper<int> i1(i); // lvalue
+  // sqrl::reference_wrapper<int> i2(1); // rvalue is not allowed
   ASSERT_EQ(*i1, 1);
   i = 3;
   ASSERT_EQ(*i1, 3);

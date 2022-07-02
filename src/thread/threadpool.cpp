@@ -1,6 +1,6 @@
 #include <thread/threadpool.h>
 
-namespace sql {
+namespace sqrl {
 
 ThreadPool::ThreadPool(int pool_size) : pool_size(pool_size) {
   handled_tasks_num = 0;
@@ -50,4 +50,4 @@ void ThreadPool::stop() {
   workers.clear();
 }
 
-}; // namespace sql
+}; // namespace sqrl

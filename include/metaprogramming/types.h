@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace sql {
+namespace sqrl {
 
 // integral constant
 template <class T, T v> struct integral_constant {
@@ -143,6 +143,6 @@ struct is_nothrow_constructible
     : public std::integral_constant<bool,
                                     noexcept(Fp(std::declval<Args>()...))> {};
 
-}; // namespace sql
+}; // namespace sqrl
 
 #endif

@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-namespace sql {
+namespace sqrl {
 
 class ThreadPool {
 public:
@@ -57,6 +57,6 @@ auto ThreadPool::enqueue(T &&t, Args &&...args)
   return result;
 }
 
-}; // namespace sql
+}; // namespace sqrl
 
 #endif

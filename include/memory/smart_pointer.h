@@ -4,7 +4,7 @@
 #include <memory/allocator.h>
 #include <metaprogramming/types.h>
 
-namespace sql {
+namespace sqrl {
 
 // by default use delete since unique_ptr has no idea
 // what allocator input pointer is using
@@ -163,18 +163,18 @@ public:
 };
 
 // implement make_unique and make_shared
-// make_xxx are all using sql::Allocator to manage memory
+// make_xxx are all using sqrl::Allocator to manage memory
 template <class T> class _make_deleter {
 
 public:
   static void clean(T *data) {
-    sql::Allocator<T> allocator;
+    sqrl::Allocator<T> allocator;
     allocator.deallocate(data, sizeof(T));
   }
 };
 
 template <class T> struct unique_t {
-  typedef sql::unique_ptr<T, _make_deleter<T>> type;
+  typedef sqrl::unique_ptr<T, _make_deleter<T>> type;
 };
 
 template <class T> struct unique_t<T[]> {
@@ -194,14 +194,14 @@ template <class T> struct unique_t<T *> {
 
 template <class T, class... Args>
 typename unique_t<T>::type make_unique(Args &&...args) {
-  sql::Allocator<T> local_allocator;
+  sqrl::Allocator<T> local_allocator;
   T *slot = local_allocator.allocate(sizeof(T));
   T *init = new (slot) T(std::forward<Args>(args)...);
   return unique_ptr<T, _make_deleter<T>>(init);
 }
 
 template <class T> struct shared_t {
-  typedef sql::shared_ptr<T, _make_deleter<T>> type;
+  typedef sqrl::shared_ptr<T, _make_deleter<T>> type;
 };
 
 template <class T> struct shared_t<T[]> {
@@ -221,12 +221,12 @@ template <class T> struct shared_t<T *> {
 
 template <class T, class... Args>
 typename shared_t<T>::type make_shared(Args &&...args) {
-  sql::Allocator<T> local_allocator;
+  sqrl::Allocator<T> local_allocator;
   T *slot = local_allocator.allocate(sizeof(T));
   T *init = new (slot) T(std::forward<Args>(args)...);
   return shared_ptr<T, _make_deleter<T>>(init);
 }
 
-}; // namespace sql
+}; // namespace sqrl
 
 #endif

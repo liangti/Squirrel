@@ -1,6 +1,6 @@
 #include <memory/reclaimer.h>
 
-namespace sql {
+namespace sqrl {
 
 namespace {
 static Block *_head = _block_head;
@@ -11,4 +11,4 @@ static size_t _allocated = _block_allocated;
 
 void Reclaimer::run() {}
 
-}; // namespace sql
+}; // namespace sqrl
