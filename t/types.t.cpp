@@ -89,6 +89,21 @@ TEST(test_types, remove_array) {
   EXPECT_TRUE(t3);
 }
 
+TEST(test_types, remove_pointer){
+  using type1 = sqrl::remove_pointer<int>::type;
+  using type2 = sqrl::remove_pointer<int*>::type;
+  using type3 = sqrl::remove_pointer<const int*>::type;
+  using type4 = sqrl::remove_pointer<int* const>::type;
+  bool t1 = same_t<type1, int>::value;
+  bool t2 = same_t<type2, int>::value;
+  bool t3 = same_t<type3, int>::value;
+  bool t4 = same_t<type4, int>::value;
+  EXPECT_TRUE(t1);
+  EXPECT_TRUE(t2);
+  EXPECT_TRUE(t3);
+  EXPECT_TRUE(t4);
+}
+
 TEST(test_types, is_pointer) {
   bool t1 = sqrl::is_pointer<int>::value;
   bool t2 = sqrl::is_pointer<int &>::value;

@@ -50,6 +50,12 @@ template <typename T> struct remove_array<T[]> { using type = T; };
 
 template <typename T, int N> struct remove_array<T[N]> { using type = T; };
 
+// remove_pointer <T> remove * from a type
+template <typename T> struct remove_pointer { using type = T; };
+template <typename T> struct remove_pointer<T*> { using type = T; };
+template <typename T> struct remove_pointer<T* const> { using type = T; };
+template <typename T> struct remove_pointer<const T*> { using type = T; };
+
 // is_pointer determine if a type is a pointer
 template <typename T> struct is_pointer : false_type {};
 template <typename T> struct is_pointer<T *> : true_type {};
