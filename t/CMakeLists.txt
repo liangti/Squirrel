@@ -10,6 +10,7 @@ foreach(
     memory-utils
     memory-allocator
     destroy
+    dyn-cast
     function
     smart-pointer
     string-basic
