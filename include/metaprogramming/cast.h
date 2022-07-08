@@ -5,20 +5,13 @@
 
 #include <metaprogramming/tuple.h>
 #include <metaprogramming/types.h>
+#include <metaprogramming/hash.h>
+
+#include <abi/vtable.h>
 
 namespace sqrl {
 
 namespace {
-struct pair_hash {
-  template <class T1, class T2>
-  std::size_t operator()(const std::pair<T1, T2> &p) const {
-    auto h1 = std::hash<T1>{}(p.first);
-    auto h2 = std::hash<T2>{}(p.second);
-
-    // order does matter
-    return h1 ^ h2 + h1;
-  }
-};
 
 // if <T1, T2> pair exists it means T1 is base class of T2
 static std::unordered_set<std::pair<size_t, size_t>, pair_hash> type_edges;
@@ -131,6 +124,7 @@ template <typename To, typename From> To dyn_cast(From from) {
     }
     return (ToT *)from;
   }
+  else{}
 
   static_assert("Not support yet");
 }

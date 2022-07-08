@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(
     squirrel
+    src/abi/vtable.cpp
     src/memory/block.c
     src/memory/reclaimer.cpp
     src/memory/allocator.cpp
