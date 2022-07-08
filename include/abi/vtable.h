@@ -1,6 +1,9 @@
 #ifndef INCLUDED_VTABLE_H
 #define INCLUDED_VTABLE_H
 
+#include <cstddef>
+#include <typeinfo>
+
 namespace sqrl {
 
 // Given a pointer x return its vptr pointer

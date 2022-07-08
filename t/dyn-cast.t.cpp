@@ -80,3 +80,30 @@ TEST(test_dyn_cast, cast_to_derived) {
   EXPECT_TRUE(sqrl::is_a<AddTwo>(bb));
   EXPECT_TRUE(sqrl::is_a<AddTwo>(ab));
 }
+
+struct Left {
+  virtual int left() { return 1; }
+  virtual void another() {}
+};
+struct Mid {
+  virtual int mid() { return 2; }
+};
+struct Right {
+  virtual int right() { return 3; }
+};
+struct Move : public Left, public Mid, public Right {
+  virtual int right() { return 4; }
+  int data;
+};
+
+TEST(test_dyn_cast, cast_to_sibling) {
+  sqrl::type_info_register<Left, Mid, Right, Move>();
+  sqrl::store_object_memory_layout<Move, Left, Mid, Right>();
+  Move *move = new Move();
+  Left *left = sqrl::dyn_cast<Left *>(move);
+  // sibling cast here!!!
+  Right *right = sqrl::dyn_cast<Right *>(left);
+  ASSERT_EQ(move->right(), 4);
+  ASSERT_EQ(left->left(), 1);
+  ASSERT_EQ(right->right(), 4);
+}

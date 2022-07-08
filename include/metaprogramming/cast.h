@@ -3,9 +3,9 @@
 
 #include <unordered_set>
 
+#include <metaprogramming/hash.h>
 #include <metaprogramming/tuple.h>
 #include <metaprogramming/types.h>
-#include <metaprogramming/hash.h>
 
 #include <abi/vtable.h>
 
@@ -16,8 +16,7 @@ namespace {
 // if <T1, T2> pair exists it means T1 is base class of T2
 static std::unordered_set<std::pair<size_t, size_t>, pair_hash> type_edges;
 
-template <typename T1, typename T2>
-constexpr inline void insert_type_edge(){
+template <typename T1, typename T2> constexpr inline void insert_type_edge() {
   if constexpr (std::is_base_of<T1, T2>::value) {
     type_edges.emplace(typeid(T1).hash_code(), typeid(T2).hash_code());
   }
@@ -26,9 +25,13 @@ constexpr inline void insert_type_edge(){
   }
 }
 
+inline bool is_base_of(size_t t1, size_t t2) {
+  return type_edges.find(std::make_pair(t1, t2)) != type_edges.cend();
+}
+
 template <typename Empty> constexpr void register_types_first_loop() {}
 
-/* 
+/*
 Register type relationship of T1 against all the rest of types in
 template type list.
 
@@ -119,14 +122,24 @@ template <typename To, typename From> To dyn_cast(From from) {
     // must dereference in order to get runtime type info
     size_t from_id = typeid(*from).hash_code();
     size_t to_id = typeid(ToT).hash_code();
-    if (type_edges.find(std::make_pair(from_id, to_id)) != type_edges.cend()) {
+    if (sqrl::is_base_of(from_id, to_id)) {
       return nullptr;
     }
     return (ToT *)from;
+  } else {
+    size_t from_id = typeid(FromT).hash_code();
+    size_t to_id = typeid(ToT).hash_code();
+    size_t mdo_id = get_vtable_typeid(get_vtable(from));
+    if (sqrl::is_base_of(from_id, mdo_id) && sqrl::is_base_of(to_id, mdo_id)) {
+      int offset_to_mdo = get_object_offset(mdo_id, from_id);
+      int offset_to_to = get_object_offset(mdo_id, to_id);
+      char *raw = reinterpret_cast<char *>(from);
+      raw = raw - offset_to_mdo + offset_to_to;
+      return reinterpret_cast<ToT *>(raw);
+    }
   }
-  else{}
 
-  static_assert("Not support yet");
+  return nullptr;
 }
 
 }; // namespace sqrl
