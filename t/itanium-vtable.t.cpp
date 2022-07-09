@@ -1,4 +1,4 @@
-#include <abi/vtable.h>
+#include <compiler/vtable.h>
 #include <gtest/gtest.h>
 
 struct Left {
@@ -17,20 +17,20 @@ struct Down {
 struct Move : public Left, public Right, public Up, public Down {};
 
 TEST(test_vtable, test_get_object_offset) {
-  sqrl::store_object_memory_layout<Move, Left, Right, Up, Down>();
+  sqrl::compiler::store_object_memory_layout<Move, Left, Right, Up, Down>();
   size_t move_id = typeid(Move).hash_code();
   size_t left_id = typeid(Left).hash_code();
   size_t right_id = typeid(Right).hash_code();
   size_t up_id = typeid(Up).hash_code();
   size_t down_id = typeid(Down).hash_code();
   int offset = 0;
-  ASSERT_EQ(sqrl::get_object_offset(move_id, left_id), offset);
+  ASSERT_EQ(sqrl::details::get_object_offset(move_id, left_id), offset);
   offset += sizeof(Left);
-  ASSERT_EQ(sqrl::get_object_offset(move_id, right_id), offset);
+  ASSERT_EQ(sqrl::details::get_object_offset(move_id, right_id), offset);
   offset += sizeof(Right);
-  ASSERT_EQ(sqrl::get_object_offset(move_id, up_id), offset);
+  ASSERT_EQ(sqrl::details::get_object_offset(move_id, up_id), offset);
   offset += sizeof(Up);
-  ASSERT_EQ(sqrl::get_object_offset(move_id, down_id), offset);
+  ASSERT_EQ(sqrl::details::get_object_offset(move_id, down_id), offset);
 }
 
 TEST(test_vtable, test_get_vtable_offset) {
@@ -41,13 +41,13 @@ TEST(test_vtable, test_get_vtable_offset) {
   Down *down = dynamic_cast<Down *>(move);
 
   int offset = 0;
-  ASSERT_EQ(sqrl::get_vtable_offset(get_vtable(left)), offset);
+  ASSERT_EQ(sqrl::details::get_vtable_offset(__gEt_vTaBle(left)), offset);
   offset -= sizeof(Left);
-  ASSERT_EQ(sqrl::get_vtable_offset(get_vtable(right)), offset);
+  ASSERT_EQ(sqrl::details::get_vtable_offset(__gEt_vTaBle(right)), offset);
   offset -= sizeof(Right);
-  ASSERT_EQ(sqrl::get_vtable_offset(get_vtable(up)), offset);
+  ASSERT_EQ(sqrl::details::get_vtable_offset(__gEt_vTaBle(up)), offset);
   offset -= sizeof(Up);
-  ASSERT_EQ(sqrl::get_vtable_offset(get_vtable(down)), offset);
+  ASSERT_EQ(sqrl::details::get_vtable_offset(__gEt_vTaBle(down)), offset);
 }
 
 TEST(test_vtable, test_get_vtable_typeid) {
@@ -57,13 +57,14 @@ TEST(test_vtable, test_get_vtable_typeid) {
   Up *up = dynamic_cast<Up *>(move);
   Down *down = dynamic_cast<Down *>(move);
 
-  ASSERT_EQ(sqrl::get_vtable_typeid(get_vtable(move)),
+  ASSERT_EQ(sqrl::details::get_vtable_typeid(__gEt_vTaBle(move)),
             typeid(*move).hash_code());
-  ASSERT_EQ(sqrl::get_vtable_typeid(get_vtable(left)),
+  ASSERT_EQ(sqrl::details::get_vtable_typeid(__gEt_vTaBle(left)),
             typeid(*left).hash_code());
-  ASSERT_EQ(sqrl::get_vtable_typeid(get_vtable(right)),
+  ASSERT_EQ(sqrl::details::get_vtable_typeid(__gEt_vTaBle(right)),
             typeid(*right).hash_code());
-  ASSERT_EQ(sqrl::get_vtable_typeid(get_vtable(up)), typeid(*up).hash_code());
-  ASSERT_EQ(sqrl::get_vtable_typeid(get_vtable(down)),
+  ASSERT_EQ(sqrl::details::get_vtable_typeid(__gEt_vTaBle(up)),
+            typeid(*up).hash_code());
+  ASSERT_EQ(sqrl::details::get_vtable_typeid(__gEt_vTaBle(down)),
             typeid(*down).hash_code());
 }

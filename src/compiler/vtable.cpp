@@ -1,6 +1,6 @@
 #include <unordered_map>
 
-#include <abi/vtable.h>
+#include <compiler/vtable.h>
 #include <metaprogramming/hash.h>
 
 namespace sqrl {
@@ -39,12 +39,13 @@ std::unordered_map<std::pair<size_t, size_t>, int, pair_hash>
 
 }; // namespace
 
-namespace details {
+namespace compiler {
 void insert_to_offset_map(size_t derived_id, size_t base_id, int offset) {
   objects_memory_offset.emplace(std::make_pair(derived_id, base_id), offset);
 }
-}; // namespace details
+}; // namespace compiler
 
+namespace details {
 /*
 Given:
 class A: public B, public C, public D{};
@@ -91,5 +92,7 @@ int get_object_offset(size_t mdo, size_t sub) {
   }
   return -1;
 }
+
+}; // namespace details
 
 }; // namespace sqrl

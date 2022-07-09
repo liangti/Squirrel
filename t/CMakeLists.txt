@@ -7,12 +7,12 @@ configure_file(
 
 foreach(
     TEST
-    abi-vtable
     memory-utils
     memory-allocator
     destroy
     dyn-cast
     function
+    itanium-vtable
     smart-pointer
     string-basic
     threadpool

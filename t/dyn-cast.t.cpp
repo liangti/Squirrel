@@ -65,7 +65,7 @@ member is not initialized
 */
 TEST(test_dyn_cast, cast_to_derived) {
   Base *b = new Base();
-  sqrl::type_info_register<Base, AddTwo>();
+  sqrl::compiler::type_info_register<Base, AddTwo>();
   AddTwo *a = sqrl::dyn_cast<AddTwo *>(b);
   ASSERT_EQ(a, nullptr);
   AddTwo *aa = new AddTwo();
@@ -97,8 +97,8 @@ struct Move : public Left, public Mid, public Right {
 };
 
 TEST(test_dyn_cast, cast_to_sibling) {
-  sqrl::type_info_register<Left, Mid, Right, Move>();
-  sqrl::store_object_memory_layout<Move, Left, Mid, Right>();
+  sqrl::compiler::type_info_register<Left, Mid, Right, Move>();
+  sqrl::compiler::store_object_memory_layout<Move, Left, Mid, Right>();
   Move *move = new Move();
   Left *left = sqrl::dyn_cast<Left *>(move);
   // sibling cast here!!!

@@ -7,80 +7,10 @@
 #include <metaprogramming/tuple.h>
 #include <metaprogramming/types.h>
 
-#include <abi/vtable.h>
+#include <compiler/types.h>
+#include <compiler/vtable.h>
 
 namespace sqrl {
-
-namespace {
-
-// if <T1, T2> pair exists it means T1 is base class of T2
-static std::unordered_set<std::pair<size_t, size_t>, pair_hash> type_edges;
-
-template <typename T1, typename T2> constexpr inline void insert_type_edge() {
-  if constexpr (std::is_base_of<T1, T2>::value) {
-    type_edges.emplace(typeid(T1).hash_code(), typeid(T2).hash_code());
-  }
-  if constexpr (std::is_base_of<T2, T1>::value) {
-    type_edges.emplace(typeid(T2).hash_code(), typeid(T1).hash_code());
-  }
-}
-
-inline bool is_base_of(size_t t1, size_t t2) {
-  return type_edges.find(std::make_pair(t1, t2)) != type_edges.cend();
-}
-
-template <typename Empty> constexpr void register_types_first_loop() {}
-
-/*
-Register type relationship of T1 against all the rest of types in
-template type list.
-
-For example:
-register_types_first_loop<T1, T2, T3, T4>();
-
-It should run:
-insert_type_edge<T1, T2>();
-insert_type_edge<T1, T3>();
-insert_type_edge<T1, T4>();
-*/
-template <typename T1, typename T2, typename... Args>
-constexpr void register_types_first_loop() {
-  insert_type_edge<T1, T2>();
-  register_types_first_loop<T1, Args...>();
-}
-
-template <bool> constexpr void register_types_second_loop() {}
-
-/*
-Register each type in template argument list.
-
-For example:
-register_types_second_loop<T1, T2, T3, T4>();
-
-It should run:
-register_types_first_loop<T1, T2, T3, T4>();
-  insert_type_edge<T1, T2>();
-  insert_type_edge<T1, T3>();
-  insert_type_edge<T1, T4>();
-register_types_first_loop<T2, T3, T4>();
-  insert_type_edge<T2, T3>();
-  insert_type_edge<T2, T4>();
-...
-
-Since insert_type_edge is bidirection it will eventually capture all
-combination of pairs of types in template argument list.
-*/
-template <bool Na, typename T, typename... Args>
-constexpr void register_types_second_loop() {
-  register_types_first_loop<T, Args...>();
-  register_types_second_loop<Na, Args...>();
-}
-
-}; // namespace
-
-template <typename... Args> constexpr void type_info_register() {
-  register_types_second_loop<true, Args...>();
-}
 
 template <typename To, typename From> bool is_a(From from) {
   static_assert(sqrl::is_pointer<From>::value,
@@ -122,17 +52,18 @@ template <typename To, typename From> To dyn_cast(From from) {
     // must dereference in order to get runtime type info
     size_t from_id = typeid(*from).hash_code();
     size_t to_id = typeid(ToT).hash_code();
-    if (sqrl::is_base_of(from_id, to_id)) {
+    if (sqrl::details::is_base_of(from_id, to_id)) {
       return nullptr;
     }
     return (ToT *)from;
   } else {
     size_t from_id = typeid(FromT).hash_code();
     size_t to_id = typeid(ToT).hash_code();
-    size_t mdo_id = get_vtable_typeid(get_vtable(from));
-    if (sqrl::is_base_of(from_id, mdo_id) && sqrl::is_base_of(to_id, mdo_id)) {
-      int offset_to_mdo = get_object_offset(mdo_id, from_id);
-      int offset_to_to = get_object_offset(mdo_id, to_id);
+    size_t mdo_id = details::get_vtable_typeid(__gEt_vTaBle(from));
+    if (sqrl::details::is_base_of(from_id, mdo_id) &&
+        sqrl::details::is_base_of(to_id, mdo_id)) {
+      int offset_to_mdo = details::get_object_offset(mdo_id, from_id);
+      int offset_to_to = details::get_object_offset(mdo_id, to_id);
       char *raw = reinterpret_cast<char *>(from);
       raw = raw - offset_to_mdo + offset_to_to;
       return reinterpret_cast<ToT *>(raw);
