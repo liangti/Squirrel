@@ -149,6 +149,16 @@ struct is_nothrow_constructible
     : public std::integral_constant<bool,
                                     noexcept(Fp(std::declval<Args>()...))> {};
 
+// type_identity
+// is used to disable type deduction to require user to explicitly specify
+// type for template
+template<typename T>
+struct type_identity{
+  using type = T;
+};
+template<typename T>
+using type_identity_t = typename type_identity<T>::type;
+
 }; // namespace sqrl
 
 #endif

@@ -218,3 +218,26 @@ TEST(test_types, is_nothrow_constructible) {
   EXPECT_FALSE(c);
   EXPECT_TRUE(d);
 }
+
+template<typename T>
+void test_type_identity_func(type_identity_t<T> t){}
+
+template<typename T>
+void test_type_identity_func(T t1, type_identity_t<T> t2){}
+
+template<typename T>
+struct test_type_identity_object{
+  test_type_identity_object() = delete;
+  test_type_identity_object(type_identity_t<T> t){}
+};
+
+TEST(test_types, type_identity){
+
+  #ifdef __SQRL_TEST_EXPECT_COMPILE_TIME_FAILURE
+  test_type_identity_func(1.0); // compile error, can't infer type T
+  test_type_identity_object obj(3); // compile error, can't infer
+  #endif
+  test_type_identity_func<double>(1.0);
+  test_type_identity_func(1.0, 1.0); // can infer type T from first argument
+  test_type_identity_object<int> obj(3); // compile error, can't infer
+}
