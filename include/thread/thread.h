@@ -11,10 +11,11 @@ namespace sqrl {
 class Thread {
 private:
   pthread_t worker;
+  bool created;
 
 public:
   template <typename Callable, typename... Args>
-  explicit Thread(Callable &&fp, Args &&...args) : worker() {
+  explicit Thread(Callable &&fp, Args &&...args) noexcept : worker() {
     typedef sqrl::Tuple<Callable, Args...> fp_pack_t;
 
     struct Helper {
@@ -43,10 +44,17 @@ public:
         &worker, NULL, Helper::executor, reinterpret_cast<void *>(fp_pack));
     if (succeed != 0) {
       allocator.deallocate(pack_block, pack_size);
+      created = false;
+    } else {
+      created = true;
     }
   }
 
-  inline void join() { pthread_join(worker, NULL); }
+  inline void join() noexcept {
+    if (created) {
+      pthread_join(worker, NULL);
+    }
+  }
 };
 
 }; // namespace sqrl
