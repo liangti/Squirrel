@@ -52,9 +52,9 @@ template <typename T, int N> struct remove_array<T[N]> { using type = T; };
 
 // remove_pointer <T> remove * from a type
 template <typename T> struct remove_pointer { using type = T; };
-template <typename T> struct remove_pointer<T*> { using type = T; };
-template <typename T> struct remove_pointer<T* const> { using type = T; };
-template <typename T> struct remove_pointer<const T*> { using type = T; };
+template <typename T> struct remove_pointer<T *> { using type = T; };
+template <typename T> struct remove_pointer<T *const> { using type = T; };
+template <typename T> struct remove_pointer<const T *> { using type = T; };
 
 // is_pointer determine if a type is a pointer
 template <typename T> struct is_pointer : false_type {};
@@ -152,12 +152,28 @@ struct is_nothrow_constructible
 // type_identity
 // is used to disable type deduction to require user to explicitly specify
 // type for template
-template<typename T>
-struct type_identity{
-  using type = T;
+template <typename T> struct type_identity { using type = T; };
+template <typename T> using type_identity_t = typename type_identity<T>::type;
+
+// integer_sequence
+template <typename T, T... I> struct integer_sequence {
+  typedef T type;
+  static constexpr size_t size() { return sizeof...(I); }
 };
-template<typename T>
-using type_identity_t = typename type_identity<T>::type;
+
+// make_index_sequence
+template <size_t... Ints>
+using index_sequence = integer_sequence<size_t, Ints...>;
+
+template <size_t N, size_t... Next>
+struct index_seq_helper : public index_seq_helper<N - 1, N - 1, Next...> {};
+
+template <size_t... Next> struct index_seq_helper<0, Next...> {
+  using type = index_sequence<Next...>;
+};
+
+template <size_t N>
+using make_index_sequence = typename index_seq_helper<N>::type;
 
 }; // namespace sqrl
 

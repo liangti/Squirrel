@@ -89,11 +89,11 @@ TEST(test_types, remove_array) {
   EXPECT_TRUE(t3);
 }
 
-TEST(test_types, remove_pointer){
+TEST(test_types, remove_pointer) {
   using type1 = sqrl::remove_pointer<int>::type;
-  using type2 = sqrl::remove_pointer<int*>::type;
-  using type3 = sqrl::remove_pointer<const int*>::type;
-  using type4 = sqrl::remove_pointer<int* const>::type;
+  using type2 = sqrl::remove_pointer<int *>::type;
+  using type3 = sqrl::remove_pointer<const int *>::type;
+  using type4 = sqrl::remove_pointer<int *const>::type;
   bool t1 = same_t<type1, int>::value;
   bool t2 = same_t<type2, int>::value;
   bool t3 = same_t<type3, int>::value;
@@ -219,25 +219,36 @@ TEST(test_types, is_nothrow_constructible) {
   EXPECT_TRUE(d);
 }
 
-template<typename T>
-void test_type_identity_func(type_identity_t<T> t){}
+template <typename T> void test_type_identity_func(type_identity_t<T> t) {}
 
-template<typename T>
-void test_type_identity_func(T t1, type_identity_t<T> t2){}
+template <typename T>
+void test_type_identity_func(T t1, type_identity_t<T> t2) {}
 
-template<typename T>
-struct test_type_identity_object{
+template <typename T> struct test_type_identity_object {
   test_type_identity_object() = delete;
-  test_type_identity_object(type_identity_t<T> t){}
+  test_type_identity_object(type_identity_t<T> t) {}
 };
 
-TEST(test_types, type_identity){
+TEST(test_types, type_identity) {
 
-  #ifdef __SQRL_TEST_EXPECT_COMPILE_TIME_FAILURE
-  test_type_identity_func(1.0); // compile error, can't infer type T
+#ifdef __SQRL_TEST_EXPECT_COMPILE_TIME_FAILURE
+  test_type_identity_func(1.0);     // compile error, can't infer type T
   test_type_identity_object obj(3); // compile error, can't infer
-  #endif
+#endif
   test_type_identity_func<double>(1.0);
-  test_type_identity_func(1.0, 1.0); // can infer type T from first argument
+  test_type_identity_func(1.0, 1.0);     // can infer type T from first argument
   test_type_identity_object<int> obj(3); // compile error, can't infer
+}
+
+template <typename T, T... I>
+T add_x_times(T input[], integer_sequence<T, I...> seqs) {
+  T result = 0;
+  ((result += input[I]), ...);
+  return result;
+}
+
+TEST(test_types, integer_sequence) {
+  size_t local[3] = {1, 2, 3};
+  size_t result = add_x_times(local, make_index_sequence<3>{});
+  ASSERT_EQ(result, 6);
 }

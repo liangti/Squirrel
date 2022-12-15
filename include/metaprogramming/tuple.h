@@ -92,13 +92,13 @@ inline constexpr ignore_t ignore; // inline for avoiding ODR
 // apply
 template <typename Callable, typename... Args, size_t... I>
 auto _apply_impl(Tuple<Callable, Args...> &pack,
-                 std::integer_sequence<size_t, I...>) {
+                 sqrl::integer_sequence<size_t, I...>) {
   return get<0>(pack)(get<I + 1>(pack)...);
 }
 
 template <typename Callable, typename... Args>
 auto apply(Tuple<Callable, Args...> &pack) {
-  return _apply_impl(pack, std::make_index_sequence<sizeof...(Args)>());
+  return _apply_impl(pack, sqrl::make_index_sequence<sizeof...(Args)>());
 }
 
 }; // namespace sqrl
