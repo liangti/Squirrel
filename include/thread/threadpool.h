@@ -10,6 +10,8 @@
 #include <utility>
 #include <vector>
 
+#include <metaprogramming/types.h>
+
 namespace sqrl {
 
 class ThreadPool {
@@ -21,7 +23,7 @@ public:
 
   template <class T, class... Args>
   auto enqueue(T &&t, Args &&...args)
-      -> std::future<typename std::result_of<T(Args...)>::type>;
+      -> std::future<typename sqrl::result_of<T(Args...)>::type>;
 
   // remove copy methods
   ThreadPool(const ThreadPool &) = delete;
@@ -43,8 +45,8 @@ private:
 };
 template <class T, class... Args>
 auto ThreadPool::enqueue(T &&t, Args &&...args)
-    -> std::future<typename std::result_of<T(Args...)>::type> {
-  using return_type = typename std::result_of<T(Args...)>::type;
+    -> std::future<typename sqrl::result_of<T(Args...)>::type> {
+  using return_type = typename sqrl::result_of<T(Args...)>::type;
 
   auto task = std::make_shared<std::packaged_task<return_type()>>(
       std::bind(std::forward<T>(t), std::forward<Args>(args)...));
