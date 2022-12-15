@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <metaprogramming/types.h>
+#include <utility>
 
 namespace sqrl {
 
@@ -10,9 +11,8 @@ namespace sqrl {
 
 template <typename... Ts> class Tuple {};
 
-struct ignore_t{
-  template<typename T>
-  constexpr void operator=(const T&) const{
+struct ignore_t {
+  template <typename T> constexpr void operator=(const T &) const {
     // do nothing
   }
 };
@@ -23,9 +23,8 @@ public:
   Tuple<Ts...> tail;
   Tuple(const T &t, const Ts &...ts) : head(t), tail(ts...) {}
 
-  template<typename... Args>
-  Tuple& operator=(const Tuple<Args...>& other){
-    if constexpr(!sqrl::same_t<T, ignore_t>::value){
+  template <typename... Args> Tuple &operator=(const Tuple<Args...> &other) {
+    if constexpr (!sqrl::same_t<T, ignore_t>::value) {
       head = other.head;
     }
     tail = other.tail;
@@ -58,7 +57,7 @@ constexpr auto get(Tuple<Args...> &tuple) {
 }
 
 // size method
-template <class Tuple> int size(Tuple &tuple) { return 0; }
+template <class Tuple> constexpr int size(Tuple &tuple) { return 0; }
 
 template <template <typename...> class Tuple, typename t, typename... ts>
 constexpr int size(Tuple<t, ts...> &tuple) {
@@ -83,13 +82,24 @@ template <typename... Args> auto make_tuple(Args &&...args) {
 }
 
 // tie
-template <typename... Args>
-constexpr Tuple<Args&...> tie(Args&... args){
+template <typename... Args> constexpr Tuple<Args &...> tie(Args &...args) {
   return {args...};
 }
 
 // ignore
 inline constexpr ignore_t ignore; // inline for avoiding ODR
+
+// apply
+template <typename Callable, typename... Args, size_t... I>
+auto _apply_impl(Tuple<Callable, Args...> &pack,
+                 std::integer_sequence<size_t, I...>) {
+  return get<0>(pack)(get<I + 1>(pack)...);
+}
+
+template <typename Callable, typename... Args>
+auto apply(Tuple<Callable, Args...> &pack) {
+  return _apply_impl(pack, std::make_index_sequence<sizeof...(Args)>());
+}
 
 }; // namespace sqrl
 

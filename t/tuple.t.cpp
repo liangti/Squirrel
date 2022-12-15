@@ -3,9 +3,7 @@
 
 using namespace sqrl;
 
-TEST(test_tuple, construct_empty_tuple) { 
-  [[maybe_unused]] Tuple<> empty;
-}
+TEST(test_tuple, construct_empty_tuple) { [[maybe_unused]] Tuple<> empty; }
 
 TEST(test_tuple, construct_simple_tuple) {
   Tuple<char, int, double> tuple('a', 1, 0.3);
@@ -39,26 +37,34 @@ TEST(test_tuple, make_tuple) {
   ASSERT_EQ(get<2>(tuple), 3);
 }
 
-TEST(test_tuple, other_type_copy){
+TEST(test_tuple, other_type_copy) {
   int a = 1;
-  Tuple<int&> t1(a);
+  Tuple<int &> t1(a);
   Tuple<int> t2(3);
   t1 = t2;
   ASSERT_EQ(a, 3);
 }
 
-TEST(test_tuple, tie){
-  auto tuple = make_tuple(1, 2);
+TEST(test_tuple, tie) {
+  auto tuple = make_tuple(1, 2, 3);
   int a;
   int b;
-  tie(a, b) = tuple;
+  int c;
+  tie(a, b, c) = tuple;
   ASSERT_EQ(a, 1);
   ASSERT_EQ(b, 2);
+  ASSERT_EQ(c, 3);
 }
 
-TEST(test_tuple, ignore){
-  auto tuple = make_tuple(100, 2);
+TEST(test_tuple, ignore) {
+  auto tuple = make_tuple(100, 2, 0);
   int a;
-  tie(a, ignore) = tuple;
+  tie(a, ignore, ignore) = tuple;
   ASSERT_EQ(a, 100);
+}
+
+TEST(test_tuple, apply) {
+  auto tuple = make_tuple([](int x) { return x + 1; }, 1);
+  int result = apply(tuple);
+  ASSERT_EQ(result, 2);
 }
