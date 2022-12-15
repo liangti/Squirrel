@@ -15,6 +15,7 @@ foreach(
     itanium-vtable
     smart-pointer
     string-basic
+    thread
     threadpool
     tuple
     types

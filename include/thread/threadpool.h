@@ -1,5 +1,5 @@
-#ifndef INCLUDED_THREAD_H
-#define INCLUDED_THREAD_H
+#ifndef INCLUDED_THREADPOOL_H
+#define INCLUDED_THREADPOOL_H
 
 #include <condition_variable>
 #include <functional>
