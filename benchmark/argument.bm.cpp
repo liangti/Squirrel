@@ -2,13 +2,21 @@
 
 #include <metaprogramming/tuple.h>
 
+#ifdef __GNUC__
+#define CALL_CONV __attribute__((cdecl))
+#warning "Using call convention cdecl"
+#else
+#define CALL_CONV
+#warning "Not GCC compiler, will ignore call convention macro"
+#endif
+
 template<typename T>
-auto value(T t){
+auto CALL_CONV value(T t){
   return t;
 }
 
 template<typename T>
-auto ref(const T& t){
+auto CALL_CONV ref(const T& t){
   return t;
 }
 
