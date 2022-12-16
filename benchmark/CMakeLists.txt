@@ -3,6 +3,7 @@ find_package(benchmark REQUIRED)
 foreach(
     BENCHMARK
     string
+    argument
 )
 
     add_executable(${BENCHMARK}.bm ${BENCHMARK}.bm.cpp)
