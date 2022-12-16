@@ -68,3 +68,12 @@ TEST(test_tuple, apply) {
   int result = apply(tuple);
   ASSERT_EQ(result, 2);
 }
+
+TEST(test_tuple, make_tuple_size_internal) {
+  auto tuple = make_repeat_integer_tuple<1>();
+  ASSERT_EQ(sizeof(tuple), sizeof(size_t) * 2);
+  auto tuple2 = make_repeat_integer_tuple<2>();
+  ASSERT_EQ(sizeof(tuple2), sizeof(size_t) * 3);
+  auto tuple3 = make_repeat_integer_tuple<3>();
+  ASSERT_EQ(sizeof(tuple3), sizeof(size_t) * 4);
+}

@@ -101,6 +101,17 @@ auto apply(Tuple<Callable, Args...> &pack) {
   return _apply_impl(pack, sqrl::make_index_sequence<sizeof...(Args)>());
 }
 
+// make_repeat_integer_tuple
+// make a tuple with N of integer
+template <typename T, T... I>
+auto make_repeat_tuple_helper(sqrl::integer_sequence<T, I...> seqs) {
+  return sqrl::make_tuple(I...);
+}
+
+template <size_t N> auto make_repeat_integer_tuple() {
+  return make_repeat_tuple_helper(sqrl::make_index_sequence<N>());
+}
+
 }; // namespace sqrl
 
 #endif
