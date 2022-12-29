@@ -12,10 +12,12 @@ class Thread {
 private:
   pthread_t worker;
   bool created;
+  bool joined;
 
 public:
   template <typename Callable, typename... Args>
-  explicit Thread(Callable &&fp, Args &&...args) noexcept : worker() {
+  explicit Thread(Callable &&fp, Args &&...args) noexcept
+      : worker(), joined(false) {
     typedef sqrl::Tuple<Callable, Args...> fp_pack_t;
 
     struct Helper {
@@ -51,10 +53,13 @@ public:
   }
 
   inline void join() noexcept {
-    if (created) {
+    if (created && !joined) {
       pthread_join(worker, NULL);
+      joined = true;
     }
   }
+
+  ~Thread() { join(); }
 };
 
 }; // namespace sqrl
