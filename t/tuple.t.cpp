@@ -64,9 +64,20 @@ TEST(test_tuple, ignore) {
 }
 
 TEST(test_tuple, apply) {
-  auto tuple = make_tuple([](int x) { return x + 1; }, 1);
-  int result = apply(tuple);
+  auto value = make_tuple([](int x) { return x + 1; }, 1);
+  int result = apply(value);
   ASSERT_EQ(result, 2);
+
+  // reference
+  int x = 1;
+  auto ref = make_tuple([&]() { x += 1; });
+  apply(ref);
+  ASSERT_EQ(x, 2);
+
+  // pointer
+  auto pointer = make_tuple([](int *x) { (*x) += 1; }, &x);
+  apply(pointer);
+  ASSERT_EQ(x, 3);
 }
 
 TEST(test_tuple, make_tuple_size_internal) {
