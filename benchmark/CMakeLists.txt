@@ -4,6 +4,7 @@ foreach(
     BENCHMARK
     string
     argument
+    allocator
 )
 
     add_executable(${BENCHMARK}.bm ${BENCHMARK}.bm.cpp)
