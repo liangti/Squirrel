@@ -38,8 +38,6 @@ extern size_t _block_allocated;
 
 size_t align(size_t);
 
-word_t *alloc(size_t);
-
 size_t alloc_size(size_t);
 
 block_t *request_from_os(size_t);
