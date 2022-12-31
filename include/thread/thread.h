@@ -39,7 +39,7 @@ public:
     char *pack_block = allocator.allocate(pack_size);
     fp_pack_t *memory_block = reinterpret_cast<fp_pack_t *>(pack_block);
     fp_pack_t *fp_pack = new (memory_block)
-        fp_pack_t(std::forward<Callable>(fp), std::forward<Args...>(args)...);
+        fp_pack_t(std::forward<Callable>(fp), std::forward<Args>(args)...);
 
     // error handling
     [[maybe_unused]] int succeed = pthread_create(
