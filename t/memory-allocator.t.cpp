@@ -17,9 +17,7 @@ static BlockManager manager;
 
 class MemoryAllocatorTest : public ::testing::Test {
 protected:
-  void SetUp() { 
-    ASSERT_EQ(viewer.memory_size(), 0);
-  }
+  void SetUp() { ASSERT_EQ(viewer.memory_size(), 0); }
   void TearDown() {
     manager.clear();
     ASSERT_EQ(viewer.memory_size(), 0);
@@ -77,4 +75,14 @@ TEST_F(MemoryAllocatorTest, allocate_a_list_of_objects) {
   ASSERT_EQ(viewer.memory_size(), 200 * sizeof(TestObj));
   obj_allocator.deallocate(ptr, 1);
   ASSERT_EQ(viewer.memory_size(), 0);
+}
+
+TEST_F(MemoryAllocatorTest, allocate_large_block) {
+  // FIXME: fail to allocate large block of memory
+  GTEST_SKIP();
+  size_t size = 1024 * 2048;
+  TestObj *ptr = obj_allocator.allocate(size);
+  ASSERT_EQ(viewer.memory_size(), size * sizeof(TestObj));
+  obj_allocator.deallocate(ptr, size);
+  ASSERT_EQ(viewer.memory_size(), size);
 }
