@@ -21,7 +21,7 @@ foreach(
     types
     vector
     queue
-    # TODO: fix this
+    # FIXME
     # safe-queue
 )
     add_executable(${TEST}.t ${TEST}.t.cpp)
