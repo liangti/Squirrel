@@ -10,11 +10,12 @@ struct Functor {
 };
 
 TEST(function_test, release_empty_callable) {
-  { [[maybe_unused]] function<void(int *)> fp; }
+  { [[maybe_unused]] Function<void(int *)> fp; }
+  { [[maybe_unused]] Function<void()> fp; }
 }
 
 TEST(function_test, function_pointer) {
-  function<void(int *)> fp;
+  Function<void(int *)> fp;
   fp = add_one;
   int local = 3;
   fp(&local);
@@ -22,16 +23,16 @@ TEST(function_test, function_pointer) {
 }
 
 TEST(function_test, lambda) {
-  function<void(int *)> fp;
-  fp = add_one;
+  Function<void()> fp;
   int local = 3;
-  fp(&local);
+  fp = [&]() { local = 4; };
+  fp();
   ASSERT_EQ(local, 4);
 }
 
 // this is what function pointer can't handle
 TEST(function_test, functor) {
-  function<void(int *)> fp;
+  Function<void(int *)> fp;
   Functor obj;
   fp = obj;
   int local = 3;

@@ -5,12 +5,12 @@
 
 namespace sqrl {
 
-template <typename> class function;
+template <typename> class Function;
 
-template <class Return, class... Args> class function<Return(Args...)> {
+template <class Return, class... Args> class Function<Return(Args...)> {
 public:
   // function signature or just a functor type
-  template <typename FS> function &operator=(FS fs) {
+  template <typename FS> Function &operator=(FS fs) {
     // unique_ptr is not ready for function type
     delete callable;
     callable = new CallableImpl<FS>(fs);
@@ -19,7 +19,7 @@ public:
   Return operator()(Args &&...args) {
     return callable->invoke(std::forward<Args>(args)...);
   }
-  ~function() { delete callable; }
+  ~Function() { delete callable; }
 
 private:
   struct CallableBase {
