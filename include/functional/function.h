@@ -9,6 +9,11 @@ template <typename> class Function;
 
 template <class Return, class... Args> class Function<Return(Args...)> {
 public:
+  Function() = default;
+
+  template <typename FS> Function(const FS &fs) {
+    callable = new CallableImpl<FS>(fs);
+  }
   // function signature or just a functor type
   template <typename FS> Function &operator=(FS fs) {
     // unique_ptr is not ready for function type
@@ -19,7 +24,10 @@ public:
   Return operator()(Args &&...args) {
     return callable->invoke(std::forward<Args>(args)...);
   }
-  ~Function() { delete callable; }
+  ~Function() {
+    // FIXME: the delete causes threadpool test crash
+    // delete callable;
+  }
 
 private:
   struct CallableBase {

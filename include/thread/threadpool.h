@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <metaprogramming/types.h>
+#include <functional/function.h>
 #include <thread/thread.h>
 
 namespace sqrl {
@@ -17,7 +18,7 @@ namespace sqrl {
 class ThreadPool {
 public:
   ThreadPool(int pool_size = 3);
-  typedef std::function<void()> Task;
+  typedef sqrl::Function<void()> Task;
   void start();
   void stop();
 
