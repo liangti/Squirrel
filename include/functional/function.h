@@ -1,6 +1,7 @@
 #ifndef INCLUDED_FUNCTION_H
 #define INCLUDED_FUNCTION_H
 
+#include <memory>
 #include <utility>
 
 namespace sqrl {
@@ -12,22 +13,20 @@ public:
   Function() = default;
 
   template <typename FS> Function(const FS &fs) {
-    callable = new CallableImpl<FS>(fs);
+    callable = std::make_shared<CallableImpl<FS>>(fs);
   }
   // function signature or just a functor type
   template <typename FS> Function &operator=(FS fs) {
     // unique_ptr is not ready for function type
-    delete callable;
-    callable = new CallableImpl<FS>(fs);
+    // delete callable;
+    callable.reset();
+    callable = std::make_shared<CallableImpl<FS>>(fs);
     return *this;
   }
   Return operator()(Args &&...args) {
     return callable->invoke(std::forward<Args>(args)...);
   }
-  ~Function() {
-    // FIXME: the delete causes threadpool test crash
-    // delete callable;
-  }
+  ~Function() {}
 
 private:
   struct CallableBase {
@@ -41,7 +40,8 @@ private:
     }
     FS fp;
   };
-  CallableBase *callable = nullptr;
+  // TODO: fix sqrl::shared_ptr
+  std::shared_ptr<CallableBase> callable;
 };
 
 }; // end of namespace sqrl
