@@ -6,11 +6,11 @@
 #include <future>
 #include <mutex>
 #include <queue>
-#include <thread>
 #include <utility>
 #include <vector>
 
 #include <metaprogramming/types.h>
+#include <thread/thread.h>
 
 namespace sqrl {
 
@@ -34,7 +34,7 @@ public:
   inline int get_pool_size() { return pool_size; }
 
 private:
-  typedef std::vector<std::thread *> Threads;
+  typedef std::vector<sqrl::Thread *> Threads;
   Threads workers;
   std::queue<Task> tasks;
   std::mutex lock;

@@ -10,7 +10,7 @@ void ThreadPool::start() {
   begin = true;
   workers.reserve(pool_size);
   for (int i = 0; i < pool_size; i++) {
-    workers.emplace_back(new std::thread([this]() {
+    workers.emplace_back(new sqrl::Thread([this]() {
       while (true) {
         Task task;
         // critical area, need lock for thread safe
