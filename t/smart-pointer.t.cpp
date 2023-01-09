@@ -51,7 +51,6 @@ TEST(unique_ptr_test, swap_owner_ship_when_copy) {
   unique_ptr<Obj> my_ptr(obj);
   unique_ptr<Obj> my_ptr2 = my_ptr;
   EXPECT_TRUE(my_ptr.is_null());
-  EXPECT_FALSE(!my_ptr.is_null());
   ASSERT_EQ(my_ptr2->x, 3);
 }
 
@@ -186,4 +185,17 @@ TEST(shared_ptr_test, make_shared) {
 #endif
   auto s2 = sqrl::make_shared<Obj>(3);
   ASSERT_EQ(s2->x, 3);
+}
+
+TEST(shared_ptr_test, copy){
+  Obj *obj = new Obj(3);
+  _test_allocator::reset_free_size();
+  {
+    shared_ptr<Obj, _test_allocator> s1(obj);
+    auto s2 = s1;
+    ASSERT_EQ(s1->x, 3);
+    ASSERT_EQ(s2->x, 3);
+    ASSERT_EQ(_test_allocator::get_free_size(), 0);
+  }
+  ASSERT_EQ(_test_allocator::get_free_size(), sizeof(Obj));
 }
