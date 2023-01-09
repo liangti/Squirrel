@@ -209,3 +209,11 @@ TEST(shared_ptr_test, default_constructor) {
   sqrl::shared_ptr<Obj> s;
   EXPECT_TRUE(s.is_null());
 }
+
+TEST(shared_ptr_test, reset_to_new) {
+  Obj *obj = new Obj(3);
+  Obj *obj2 = new Obj(4);
+  sqrl::shared_ptr<Obj> s(obj);
+  s.reset(obj2);
+  ASSERT_EQ(s->x, 4);
+}

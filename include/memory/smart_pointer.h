@@ -107,6 +107,12 @@ public:
     Deleter::clean(ptr);
   }
 
+  inline void reset(T *_ptr) {
+    reset();
+    ptr = _ptr;
+    count = new int(1);
+  }
+
   int get_count() { return *count; }
 };
 
