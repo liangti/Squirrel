@@ -74,7 +74,7 @@ TEST(shared_ptr_tests, recycle_memory_when_only_reference_release) {
     shared_ptr<Obj, _test_allocator> my_ptr(obj);
     ASSERT_EQ(_test_allocator::get_free_size(), 0);
   }
-  ASSERT_EQ(_test_allocator::get_free_size(), sizeof(int) + sizeof(Obj));
+  ASSERT_EQ(_test_allocator::get_free_size(), sizeof(Obj));
 }
 
 TEST(shared_ptr_tests, do_not_recycle_memory_when_not_all_release) {
@@ -171,6 +171,8 @@ TEST(unique_ptr_test, make_unique) {
   sqrl::make_unique<int[4]>(4);
   sqrl::make_unique<int *>(4);
 #endif
+  auto u2 = sqrl::make_unique<Obj>(3);
+  ASSERT_EQ(u2->x, 3);
 }
 
 TEST(shared_ptr_test, make_shared) {
@@ -182,4 +184,6 @@ TEST(shared_ptr_test, make_shared) {
   sqrl::make_shared<int[4]>(4);
   sqrl::make_shared<int *>(4);
 #endif
+  auto s2 = sqrl::make_shared<Obj>(3);
+  ASSERT_EQ(s2->x, 3);
 }

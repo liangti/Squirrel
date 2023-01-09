@@ -88,7 +88,7 @@ public:
   T &operator*() { return *ptr; }
 
   void reset() {
-    Deleter::clean(count);
+    delete count;
     Deleter::clean(ptr);
   }
 
@@ -169,7 +169,7 @@ template <class T> class _make_deleter {
 public:
   static void clean(T *data) {
     sqrl::Allocator<T> allocator;
-    allocator.deallocate(data, sizeof(T));
+    allocator.deallocate(data, 1);
   }
 };
 
