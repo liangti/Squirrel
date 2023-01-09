@@ -20,6 +20,7 @@ private:
   T *ptr;
 
 public:
+  unique_ptr() : ptr(nullptr) {}
   explicit unique_ptr(T *_ptr) : ptr(_ptr) {}
 
   unique_ptr(unique_ptr<T, Deleter> &other) {
@@ -37,7 +38,12 @@ public:
     return *this;
   }
 
-  ~unique_ptr() { Deleter::clean(ptr); }
+  ~unique_ptr() {
+    if (is_null()) {
+      return;
+    }
+    Deleter::clean(ptr);
+  }
 
   T *operator->() { return ptr; }
 
@@ -56,6 +62,7 @@ private:
   int *count;
 
 public:
+  shared_ptr() : ptr(nullptr), count(nullptr) {}
   explicit shared_ptr(T *_ptr) : ptr(_ptr), count(new int(1)) {}
 
   template <typename Allocator> shared_ptr(shared_ptr<T, Allocator> &other) {
@@ -67,6 +74,9 @@ public:
   }
 
   ~shared_ptr() {
+    if (is_null()) {
+      return;
+    }
     if ((*count) == 1) {
       reset();
     } else {
@@ -87,7 +97,12 @@ public:
 
   T &operator*() { return *ptr; }
 
-  void reset() {
+  inline bool is_null() { return count == nullptr; }
+
+  inline void reset() {
+    if (count == nullptr) {
+      return;
+    }
     delete count;
     Deleter::clean(ptr);
   }

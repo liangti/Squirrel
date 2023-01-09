@@ -187,7 +187,7 @@ TEST(shared_ptr_test, make_shared) {
   ASSERT_EQ(s2->x, 3);
 }
 
-TEST(shared_ptr_test, copy){
+TEST(shared_ptr_test, copy) {
   Obj *obj = new Obj(3);
   _test_allocator::reset_free_size();
   {
@@ -198,4 +198,14 @@ TEST(shared_ptr_test, copy){
     ASSERT_EQ(_test_allocator::get_free_size(), 0);
   }
   ASSERT_EQ(_test_allocator::get_free_size(), sizeof(Obj));
+}
+
+TEST(unique_ptr_test, default_constructor) {
+  sqrl::unique_ptr<Obj> u;
+  EXPECT_TRUE(u.is_null());
+}
+
+TEST(shared_ptr_test, default_constructor) {
+  sqrl::shared_ptr<Obj> s;
+  EXPECT_TRUE(s.is_null());
 }
