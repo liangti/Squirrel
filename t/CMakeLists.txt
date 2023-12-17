@@ -12,6 +12,7 @@ foreach(
     destroy
     dyn-cast
     function
+    future
     itanium-vtable
     smart-pointer
     string-basic
