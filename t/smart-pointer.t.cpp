@@ -49,7 +49,7 @@ TEST(unique_ptr_tests, recycle_memory_whatever) {
 TEST(unique_ptr_test, swap_owner_ship_when_copy) {
   Obj *obj = new Obj(3);
   unique_ptr<Obj> my_ptr(obj);
-  unique_ptr<Obj> my_ptr2 = my_ptr;
+  unique_ptr<Obj> my_ptr2 = std::move(my_ptr);
   EXPECT_TRUE(my_ptr.is_null());
   ASSERT_EQ(my_ptr2->x, 3);
 }
@@ -145,7 +145,7 @@ TEST(explicit_test, all_smart_pointers) {
   {
     int *i = new int(3);
     unique_ptr<int> up(i);
-    ASSERT_EQ(test_cast::cast(up), test_cast::UNIQUE_RETURN_CODE);
+    ASSERT_EQ(test_cast::cast(std::move(up)), test_cast::UNIQUE_RETURN_CODE);
   }
 }
 

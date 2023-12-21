@@ -23,14 +23,16 @@ public:
   unique_ptr() : ptr(nullptr) {}
   explicit unique_ptr(T *_ptr) : ptr(_ptr) {}
 
-  unique_ptr(unique_ptr<T, Deleter> &other) {
+  unique_ptr(const unique_ptr &) = delete;
+  unique_ptr(unique_ptr &&other) {
     ptr = other.ptr;
     if (this != &other) {
       other.ptr = nullptr;
     }
   }
 
-  unique_ptr<T, Deleter> &operator=(unique_ptr<T, Deleter> &other) {
+  unique_ptr &operator=(const unique_ptr &) = delete;
+  unique_ptr &operator=(unique_ptr &&other) {
     ptr = other.ptr;
     if (this != &other) {
       other.ptr = nullptr;
@@ -65,14 +67,23 @@ public:
   shared_ptr() : ptr(nullptr), count(nullptr) {}
   explicit shared_ptr(T *_ptr) : ptr(_ptr), count(new int(1)) {}
 
-  template <typename Allocator> shared_ptr(shared_ptr<T, Allocator> &other) {
+  shared_ptr(const shared_ptr &other) {
     count = other.count;
     ptr = other.ptr;
     if (this != &other) {
       (*count)++;
     }
   }
-
+  shared_ptr(shared_ptr &&other) {
+    if (this == &other) {
+      return;
+    }
+    count = other.count;
+    ptr = other.ptr;
+    // cleanup other
+    other.ptr = nullptr;
+    other.count = nullptr;
+  }
   ~shared_ptr() {
     if (is_null()) {
       return;
@@ -85,8 +96,7 @@ public:
   }
   T *operator->() { return ptr; }
 
-  template <typename Allocator>
-  shared_ptr<T, Deleter> &operator=(shared_ptr<T, Allocator> &rhs) {
+  shared_ptr &operator=(const shared_ptr &rhs) {
     count = rhs.count;
     ptr = rhs.ptr;
     if (this != &rhs) {
@@ -100,7 +110,7 @@ public:
   inline bool is_null() { return count == nullptr; }
 
   inline void reset() {
-    if (count == nullptr) {
+    if (is_null()) {
       return;
     }
     delete count;
