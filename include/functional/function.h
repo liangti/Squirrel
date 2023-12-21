@@ -1,8 +1,9 @@
 #ifndef INCLUDED_FUNCTION_H
 #define INCLUDED_FUNCTION_H
 
-#include <memory>
 #include <utility>
+
+#include <memory/smart_pointer.h>
 
 namespace sqrl {
 
@@ -11,16 +12,22 @@ template <typename> class Function;
 template <class Return, class... Args> class Function<Return(Args...)> {
 public:
   Function() = default;
-
-  template <typename FS> Function(const FS &fs) {
-    callable = std::make_shared<CallableImpl<FS>>(fs);
+  Function(const Function &other) { callable = other.callable; }
+  Function(Function &&other) {
+    callable = other.callable;
+    other.callable.reset();
   }
+  Function &operator=(const Function &other) {
+    callable = other.callable;
+    return *this;
+  }
+  template <typename FS>
+  Function(const FS &fs) : callable(new CallableImpl<FS>(fs)) {}
   // function signature or just a functor type
   template <typename FS> Function &operator=(FS fs) {
     // unique_ptr is not ready for function type
     // delete callable;
-    callable.reset();
-    callable = std::make_shared<CallableImpl<FS>>(fs);
+    callable.reset(new CallableImpl<FS>(fs));
     return *this;
   }
   Return operator()(Args &&...args) {
@@ -41,7 +48,7 @@ private:
     FS fp;
   };
   // TODO: sqrl::shared_ptr having same issue as raw pointer in concurrency run
-  std::shared_ptr<CallableBase> callable;
+  sqrl::shared_ptr<CallableBase> callable;
 };
 
 }; // end of namespace sqrl
