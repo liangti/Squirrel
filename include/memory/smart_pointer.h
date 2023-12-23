@@ -40,6 +40,11 @@ public:
     return *this;
   }
 
+  unique_ptr &operator=(nullptr_t) {
+    ptr = nullptr;
+    return *this;
+  }
+
   ~unique_ptr() {
     if (is_null()) {
       return;
@@ -102,6 +107,12 @@ public:
     if (this != &rhs) {
       (*count)++;
     }
+    return *this;
+  }
+
+  shared_ptr &operator=(nullptr_t) {
+    ptr = nullptr;
+    count = nullptr;
     return *this;
   }
 

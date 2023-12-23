@@ -2,9 +2,10 @@
 #define INCLUDED_FUTURE_H
 
 #include <condition_variable>
-#include <functional>
 #include <memory>
 #include <mutex>
+
+#include <functional/function.h>
 
 namespace sqrl {
 
@@ -98,7 +99,7 @@ template <class Result, class... Args> class PackageTask<Result(Args...)> {
 private:
   Promise<Result> promise;
   Future<Result> future;
-  std::function<void(Promise<Result>, Args...)> task;
+  sqrl::Function<void(Promise<Result>, Args...)> task;
   bool promise_already_satisfied;
 
 public:

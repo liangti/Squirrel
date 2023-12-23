@@ -19,7 +19,7 @@ TEST(function_test, function_pointer) {
   fp = add_one;
   int local = 3;
   fp(&local);
-  ASSERT_EQ(local, 4);
+  EXPECT_EQ(local, 4);
 }
 
 TEST(function_test, lambda) {
@@ -27,7 +27,7 @@ TEST(function_test, lambda) {
   int local = 3;
   fp = [&]() { local = 4; };
   fp();
-  ASSERT_EQ(local, 4);
+  EXPECT_EQ(local, 4);
 }
 
 // this is what function pointer can't handle
@@ -37,5 +37,21 @@ TEST(function_test, functor) {
   fp = obj;
   int local = 3;
   fp(&local);
-  ASSERT_EQ(local, 4);
+  EXPECT_EQ(local, 4);
+}
+
+TEST(function_test, copy) {
+  Function<void(int *)> fp(add_one);
+  auto copy_fp = fp;
+  int local = 3;
+  copy_fp(&local);
+  EXPECT_EQ(local, 4);
+}
+
+TEST(function_test, move) {
+  Function<void(int *)> fp(add_one);
+  auto move_fp = std::move(fp);
+  int local = 3;
+  move_fp(&local);
+  EXPECT_EQ(local, 4);
 }

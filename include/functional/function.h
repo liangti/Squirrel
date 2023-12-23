@@ -11,18 +11,18 @@ template <typename> class Function;
 
 template <class Return, class... Args> class Function<Return(Args...)> {
 public:
+  // constructors
   Function() = default;
+  template <typename FS> Function(FS fs) : callable(new CallableImpl<FS>(fs)) {}
   Function(const Function &other) { callable = other.callable; }
   Function(Function &&other) {
     callable = other.callable;
-    other.callable.reset();
+    other.callable = nullptr;
   }
   Function &operator=(const Function &other) {
     callable = other.callable;
     return *this;
   }
-  template <typename FS>
-  Function(const FS &fs) : callable(new CallableImpl<FS>(fs)) {}
   // function signature or just a functor type
   template <typename FS> Function &operator=(FS fs) {
     // unique_ptr is not ready for function type

@@ -27,13 +27,13 @@ size_t _test_allocator::_free_size;
 TEST(unique_ptr_tests, dereference) {
   int *i = new int(1);
   unique_ptr<int> my_ptr(i);
-  ASSERT_EQ(*my_ptr, 1);
+  EXPECT_EQ(*my_ptr, 1);
 }
 
 TEST(unique_ptr_tests, member_access) {
   Obj *obj = new Obj(3);
   unique_ptr<Obj> my_ptr(obj);
-  ASSERT_EQ(my_ptr->x, 3);
+  EXPECT_EQ(my_ptr->x, 3);
 }
 
 TEST(unique_ptr_tests, recycle_memory_whatever) {
@@ -41,9 +41,9 @@ TEST(unique_ptr_tests, recycle_memory_whatever) {
   _test_allocator::reset_free_size();
   {
     unique_ptr<Obj, _test_allocator> my_ptr(obj);
-    ASSERT_EQ(_test_allocator::get_free_size(), 0);
+    EXPECT_EQ(_test_allocator::get_free_size(), 0);
   }
-  ASSERT_EQ(_test_allocator::get_free_size(), sizeof(Obj));
+  EXPECT_EQ(_test_allocator::get_free_size(), sizeof(Obj));
 }
 
 TEST(unique_ptr_test, swap_owner_ship_when_copy) {
@@ -51,19 +51,19 @@ TEST(unique_ptr_test, swap_owner_ship_when_copy) {
   unique_ptr<Obj> my_ptr(obj);
   unique_ptr<Obj> my_ptr2 = std::move(my_ptr);
   EXPECT_TRUE(my_ptr.is_null());
-  ASSERT_EQ(my_ptr2->x, 3);
+  EXPECT_EQ(my_ptr2->x, 3);
 }
 
 TEST(shared_ptr_tests, dereference) {
   int *i = new int(1);
   shared_ptr<int> my_ptr(i);
-  ASSERT_EQ(*my_ptr, *i);
+  EXPECT_EQ(*my_ptr, *i);
 }
 
 TEST(shared_ptr_tests, member_access) {
   Obj *obj = new Obj(3);
   shared_ptr<Obj> my_ptr(obj);
-  ASSERT_EQ(my_ptr->x, 3);
+  EXPECT_EQ(my_ptr->x, 3);
 }
 
 TEST(shared_ptr_tests, recycle_memory_when_only_reference_release) {
@@ -71,47 +71,47 @@ TEST(shared_ptr_tests, recycle_memory_when_only_reference_release) {
   _test_allocator::reset_free_size();
   {
     shared_ptr<Obj, _test_allocator> my_ptr(obj);
-    ASSERT_EQ(_test_allocator::get_free_size(), 0);
+    EXPECT_EQ(_test_allocator::get_free_size(), 0);
   }
-  ASSERT_EQ(_test_allocator::get_free_size(), sizeof(Obj));
+  EXPECT_EQ(_test_allocator::get_free_size(), sizeof(Obj));
 }
 
 TEST(shared_ptr_tests, do_not_recycle_memory_when_not_all_release) {
   Obj *obj = new Obj(3);
   _test_allocator::reset_free_size();
   shared_ptr<Obj, _test_allocator> my_ptr(obj);
-  ASSERT_EQ(my_ptr.get_count(), 1);
+  EXPECT_EQ(my_ptr.get_count(), 1);
   {
     shared_ptr<Obj, _test_allocator> my_ptr2 = my_ptr;
-    ASSERT_EQ(_test_allocator::get_free_size(), 0);
-    ASSERT_EQ(my_ptr.get_count(), 2);
-    ASSERT_EQ(my_ptr2.get_count(), 2);
+    EXPECT_EQ(_test_allocator::get_free_size(), 0);
+    EXPECT_EQ(my_ptr.get_count(), 2);
+    EXPECT_EQ(my_ptr2.get_count(), 2);
   }
-  ASSERT_EQ(my_ptr.get_count(), 1);
-  ASSERT_EQ(_test_allocator::get_free_size(), 0);
+  EXPECT_EQ(my_ptr.get_count(), 1);
+  EXPECT_EQ(_test_allocator::get_free_size(), 0);
 }
 
 TEST(weak_ptr_test, dereference) {
   int *i = new int(3);
   shared_ptr<int> sp(i);
   weak_ptr<int> wp(sp);
-  ASSERT_EQ(*wp, *i);
+  EXPECT_EQ(*wp, *i);
 }
 
 TEST(weak_ptr_test, member_access) {
   Obj *obj = new Obj(3);
   shared_ptr<Obj> sp(obj);
   weak_ptr<Obj> wp(sp);
-  ASSERT_EQ(wp->x, 3);
+  EXPECT_EQ(wp->x, 3);
 }
 
 TEST(weak_ptr_test, rely_on_shared_pointer_reference_count) {
   int *i = new int(3);
   shared_ptr<int> sp(i);
   weak_ptr<int> wp(sp);
-  ASSERT_EQ(wp.get_count(), 1);
+  EXPECT_EQ(wp.get_count(), 1);
   shared_ptr<int> sp2 = sp;
-  ASSERT_EQ(wp.get_count(), 2);
+  EXPECT_EQ(wp.get_count(), 2);
 }
 
 // test all smart pointer will not implicitly cast to pointer type
@@ -132,20 +132,20 @@ int cast(sqrl::weak_ptr<int> x) { return WEAK_RETURN_CODE; }
 TEST(explicit_test, all_smart_pointers) {
   {
     int *i = new int(3);
-    ASSERT_EQ(test_cast::cast(i), test_cast::ORIGIN_RETURN_CODE);
+    EXPECT_EQ(test_cast::cast(i), test_cast::ORIGIN_RETURN_CODE);
     delete i;
   }
   {
     int *i = new int(3);
     shared_ptr<int> sp(i);
     weak_ptr<int> wp(sp);
-    ASSERT_EQ(test_cast::cast(sp), test_cast::SHARED_RETURN_CODE);
-    ASSERT_EQ(test_cast::cast(wp), test_cast::WEAK_RETURN_CODE);
+    EXPECT_EQ(test_cast::cast(sp), test_cast::SHARED_RETURN_CODE);
+    EXPECT_EQ(test_cast::cast(wp), test_cast::WEAK_RETURN_CODE);
   }
   {
     int *i = new int(3);
     unique_ptr<int> up(i);
-    ASSERT_EQ(test_cast::cast(std::move(up)), test_cast::UNIQUE_RETURN_CODE);
+    EXPECT_EQ(test_cast::cast(std::move(up)), test_cast::UNIQUE_RETURN_CODE);
   }
 }
 
@@ -163,7 +163,7 @@ TEST(compile_test, DISABLED_all_smart_pointers) {
 
 TEST(unique_ptr_test, make_unique) {
   auto u1 = sqrl::make_unique<int>(5);
-  ASSERT_EQ(*u1, 5);
+  EXPECT_EQ(*u1, 5);
 // disable this block since it will cause compile_time error
 #ifdef __SQRL_TEST_EXPECT_COMPILE_TIME_FAILURE
   sqrl::make_unique<int[]>(4);
@@ -171,12 +171,12 @@ TEST(unique_ptr_test, make_unique) {
   sqrl::make_unique<int *>(4);
 #endif
   auto u2 = sqrl::make_unique<Obj>(3);
-  ASSERT_EQ(u2->x, 3);
+  EXPECT_EQ(u2->x, 3);
 }
 
 TEST(shared_ptr_test, make_shared) {
   auto s1 = sqrl::make_shared<int>(5);
-  ASSERT_EQ(*s1, 5);
+  EXPECT_EQ(*s1, 5);
 // disable this block since it will cause compile_time error
 #ifdef __SQRL_TEST_EXPECT_COMPILE_TIME_FAILURE
   sqrl::make_shared<int[]>(4);
@@ -184,7 +184,7 @@ TEST(shared_ptr_test, make_shared) {
   sqrl::make_shared<int *>(4);
 #endif
   auto s2 = sqrl::make_shared<Obj>(3);
-  ASSERT_EQ(s2->x, 3);
+  EXPECT_EQ(s2->x, 3);
 }
 
 TEST(shared_ptr_test, copy) {
@@ -193,11 +193,11 @@ TEST(shared_ptr_test, copy) {
   {
     shared_ptr<Obj, _test_allocator> s1(obj);
     auto s2 = s1;
-    ASSERT_EQ(s1->x, 3);
-    ASSERT_EQ(s2->x, 3);
-    ASSERT_EQ(_test_allocator::get_free_size(), 0);
+    EXPECT_EQ(s1->x, 3);
+    EXPECT_EQ(s2->x, 3);
+    EXPECT_EQ(_test_allocator::get_free_size(), 0);
   }
-  ASSERT_EQ(_test_allocator::get_free_size(), sizeof(Obj));
+  EXPECT_EQ(_test_allocator::get_free_size(), sizeof(Obj));
 }
 
 TEST(unique_ptr_test, default_constructor) {
@@ -215,5 +215,29 @@ TEST(shared_ptr_test, reset_to_new) {
   Obj *obj2 = new Obj(4);
   sqrl::shared_ptr<Obj> s(obj);
   s.reset(obj2);
-  ASSERT_EQ(s->x, 4);
+  EXPECT_EQ(s->x, 4);
+}
+
+TEST(unique_ptr_test, set_to_nullptr_will_not_cleanup_memory) {
+  _test_allocator::reset_free_size();
+  int *a = new int(100);
+  unique_ptr<int, _test_allocator> ap(a);
+  EXPECT_EQ(*ap, 100);
+  ap = nullptr;
+  EXPECT_TRUE(ap.is_null());
+  EXPECT_EQ(_test_allocator::get_free_size(), 0);
+  EXPECT_EQ(*a, 100);
+  delete a;
+}
+
+TEST(shared_ptr_test, set_to_nullptr_will_not_cleanup_memory) {
+  _test_allocator::reset_free_size();
+  int *a = new int(100);
+  shared_ptr<int, _test_allocator> ap(a);
+  EXPECT_EQ(*ap, 100);
+  ap = nullptr;
+  EXPECT_TRUE(ap.is_null());
+  EXPECT_EQ(_test_allocator::get_free_size(), 0);
+  EXPECT_EQ(*a, 100);
+  delete a;
 }
