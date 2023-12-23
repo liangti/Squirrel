@@ -89,11 +89,16 @@ public:
   }
 };
 
-template <typename Result, typename... Args> class PackageTask {
+template <class Result, class... Args> class PackageTask;
+
+// template specialization for function type input
+// non function type input will end up geting "undefined template" compile time
+// error
+template <class Result, class... Args> class PackageTask<Result(Args...)> {
 private:
-  std::function<void(Promise<Result>, Args...)> task;
   Promise<Result> promise;
   Future<Result> future;
+  std::function<void(Promise<Result>, Args...)> task;
   bool promise_already_satisfied;
 
 public:
@@ -105,10 +110,10 @@ public:
       promise.set_value(functor(std::forward<Args>(args)...));
     };
   }
-  PackageTask(const PackageTask<Result, Args...> &) = delete;
-  PackageTask(PackageTask<Result, Args...> &&other)
-      : task(std::move(other.task)), promise(std::move(other.promise)),
-        future(std::move(other.future)) {}
+  PackageTask(const PackageTask &) = delete;
+  PackageTask(PackageTask &&other)
+      : promise(std::move(other.promise)), future(std::move(other.future)),
+        task(std::move(other.task)) {}
   void operator()(Args &&...args) {
     task(std::move(promise), std::forward<Args>(args)...);
   }

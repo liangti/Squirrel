@@ -40,14 +40,14 @@ TEST(future_test_async, basic) {
 int add(int a, int b) { return a + b; }
 
 TEST(package_task_test_sync, basic) {
-  PackageTask<int, int, int> scheduler(add);
+  PackageTask<int(int, int)> scheduler(add);
   Future<int> future = scheduler.get_future();
   scheduler(1, 2);
   EXPECT_EQ(future.get(), 3);
 }
 
 TEST(package_task_test_async, basic) {
-  PackageTask<int, int, int> scheduler(add);
+  PackageTask<int(int, int)> scheduler(add);
   Future<int> future = scheduler.get_future();
   std::thread task(std::move(scheduler), 1, 2);
   task.join();
