@@ -10,12 +10,12 @@ namespace sqrl {
 // what allocator input pointer is using
 class _deleter_default {
 public:
-  template <typename T> static void clean(T *data) { delete data; }
+  template <class T> static void clean(T *data) { delete data; }
 };
 
 // smart pointers expose to users
 
-template <typename T, class Deleter = _deleter_default> class unique_ptr {
+template <class T, class Deleter = _deleter_default> class unique_ptr {
 private:
   T *ptr;
 
@@ -59,9 +59,9 @@ public:
   bool is_null() { return ptr == nullptr; }
 };
 
-template <typename T> class weak_ptr;
+template <class T> class weak_ptr;
 
-template <typename T, class Deleter = _deleter_default> class shared_ptr {
+template <class T, class Deleter = _deleter_default> class shared_ptr {
   friend weak_ptr<T>;
 
 private:
