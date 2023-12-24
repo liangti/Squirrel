@@ -7,9 +7,9 @@
 #include <mutex>
 #include <queue>
 #include <utility>
-#include <vector>
 
 #include <async/future.h>
+#include <container/vector.h>
 #include <functional/function.h>
 #include <metaprogramming/types.h>
 #include <thread/thread.h>
@@ -36,7 +36,7 @@ public:
   inline int get_pool_size() { return pool_size; }
 
 private:
-  typedef std::vector<sqrl::Thread *> Threads;
+  typedef sqrl::Vector<sqrl::Thread *> Threads;
   Threads workers;
   std::queue<Task> tasks;
   std::mutex lock;

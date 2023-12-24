@@ -2,13 +2,13 @@
 
 namespace sqrl {
 
-ThreadPool::ThreadPool(int pool_size) : pool_size(pool_size) {
+ThreadPool::ThreadPool(int pool_size)
+    : pool_size(pool_size), workers(pool_size) {
   handled_tasks_num = 0;
 }
 
 void ThreadPool::start() {
   begin = true;
-  workers.reserve(pool_size);
   for (int i = 0; i < pool_size; i++) {
     workers.emplace_back(new sqrl::Thread([this]() {
       while (true) {
@@ -45,7 +45,6 @@ void ThreadPool::stop() {
   condition.notify_all();
   for (auto itr = workers.cbegin(); itr != workers.cend(); itr++) {
     (*itr)->join();
-    delete (*itr);
   }
   workers.clear();
 }

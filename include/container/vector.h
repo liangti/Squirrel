@@ -11,7 +11,8 @@ template <typename T> class Vector {
 public:
   // default constructor
   Vector() { _init_space(); }
-
+  // initialize with reserved capacity
+  Vector(int size) { _init_space(size); }
   // initializer list
   Vector(std::initializer_list<T> l) {
     _init_space();
@@ -39,7 +40,7 @@ public:
     }
   }
 
-  ~Vector() { _deallocate(_begin); }
+  ~Vector() { _deallocate(); }
 
   inline T *begin() const { return _begin; }
 
@@ -65,10 +66,18 @@ public:
     _top--;
   }
 
+  void clear() {
+    for (auto itr = _begin; itr < _begin + _top; ++itr) {
+      (*itr).~T();
+    }
+    _top = 0;
+  }
+
   template <typename... Args> void emplace_back(Args &&...args) {
     _check_size(_top + 1);
     // placement new is to create an object in existing address space
-    [[maybe_unused]] T *current = new (_begin + _top) T(std::forward<Args>(args)...);
+    [[maybe_unused]] T *current =
+        new (_begin + _top) T(std::forward<Args>(args)...);
     _top++;
   }
 
@@ -86,7 +95,7 @@ public:
       *current = *previous;
     }
     // delete old stuffs
-    _deallocate(_begin);
+    _deallocate();
     // renew internal settings
     _capacity = new_capacity;
     _begin = new_begin;
@@ -107,9 +116,9 @@ protected:
 
   // TODO: does it work fine with objects with virtual?
   T *_allocate(size_t capacity) { return _allocator.allocate(capacity); }
-  void _deallocate(T *begin) {
-    destroy_n(begin, _top);
-    _allocator.deallocate(begin, 1);
+  void _deallocate() {
+    destroy_n(_begin, _top);
+    _allocator.deallocate(_begin, 1); // Vector allocate a whole block of memory
   }
   void _check_size(size_t required) {
     if (required > _capacity) {
