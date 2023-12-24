@@ -44,7 +44,7 @@ template <typename To, typename From> To dyn_cast(From from) {
   static_assert(std::is_polymorphic<ToT>::value,
                 "Return type of dyn_cast must contain virtual member");
 
-  if constexpr (sqrl::same_t<FromT, ToT>::value) {
+  if constexpr (sqrl::is_same_v<FromT, ToT>) {
     return from;
   } else if constexpr (std::is_base_of<ToT, FromT>::value) {
     return (ToT *)from;

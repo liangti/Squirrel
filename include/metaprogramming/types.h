@@ -15,10 +15,15 @@ template <class T, T v> struct integral_constant {
 struct true_type : integral_constant<bool, true> {};
 struct false_type : integral_constant<bool, false> {};
 
-// same_t check types equivalent
-template <typename T, typename U> struct same_t : false_type {};
+// is_same check types equivalent
+template <typename T, typename U> struct is_same : false_type {};
 
-template <typename T> struct same_t<T, T> : true_type {};
+template <typename T> struct is_same<T, T> : true_type {};
+
+// is_same_v get the true/false value directly
+
+template <typename T, typename U>
+inline constexpr bool is_same_v = is_same<T, U>::value;
 
 // remove_cv extract type from const volatile
 

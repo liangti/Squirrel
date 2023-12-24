@@ -69,10 +69,10 @@ public:
   }
   T get() {
     wait();
-    if constexpr (sqrl::same_t<T, void>::value) {
+    if constexpr (sqrl::is_same_v<T, void>) {
       return;
     }
-    if constexpr (!sqrl::same_t<T, void>::value) {
+    if constexpr (!sqrl::is_same_v<T, void>) {
       return state->value;
     }
   }
@@ -99,7 +99,7 @@ public:
     return *this;
   }
   void set_value(typename _type_selector<T>::type value) {
-    static_assert(!sqrl::same_t<T, void>::value,
+    static_assert(!sqrl::is_same_v<T, void>,
                   "Promise<void> should use set_value()");
     std::lock_guard<std::mutex> lock(state->mutex);
     state->value = value;
@@ -108,7 +108,7 @@ public:
   }
 
   void set_value() {
-    static_assert(sqrl::same_t<T, void>::value,
+    static_assert(sqrl::is_same_v<T, void>,
                   "Promise<T> while T is not void should not use set_value()");
     state->ready = true;
     state->cvar.notify_all();
@@ -138,11 +138,11 @@ public:
     // issue: how capture arguments copy/move by std::function
     task = [functor = std::forward<F>(f)](Promise<Result> promise,
                                           Args &&...args) mutable {
-      if constexpr (sqrl::same_t<Result, void>::value) {
+      if constexpr (sqrl::is_same_v<Result, void>) {
         functor(std::forward<Args>(args)...);
         promise.set_value();
       }
-      if constexpr (!sqrl::same_t<Result, void>::value) {
+      if constexpr (!sqrl::is_same_v<Result, void>) {
         promise.set_value(functor(std::forward<Args>(args)...));
       }
     };

@@ -24,7 +24,7 @@ public:
   Tuple(const T &t, const Ts &...ts) : head(t), tail(ts...) {}
 
   template <typename... Args> Tuple &operator=(const Tuple<Args...> &other) {
-    if constexpr (!sqrl::same_t<T, ignore_t>::value) {
+    if constexpr (!sqrl::is_same_v<T, ignore_t>) {
       head = other.head;
     }
     tail = other.tail;

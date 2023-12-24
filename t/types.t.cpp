@@ -28,14 +28,31 @@ public:
   int operator&() const { return 10; }
 };
 
-TEST(test_types, check_type_equivalent) {
-  bool t1 = same_t<int, int>::value;
-  bool t2 = same_t<int, double>::value;
-  bool t3 = same_t<int, int *>::value;
-  bool t4 = same_t<int, int &>::value;
-  bool t5 = same_t<int, int &&>::value;
-  bool t6 = same_t<int, const int>::value;
-  bool t7 = same_t<int, volatile int>::value;
+TEST(test_types, is_same) {
+  bool t1 = is_same<int, int>::value;
+  bool t2 = is_same<int, double>::value;
+  bool t3 = is_same<int, int *>::value;
+  bool t4 = is_same<int, int &>::value;
+  bool t5 = is_same<int, int &&>::value;
+  bool t6 = is_same<int, const int>::value;
+  bool t7 = is_same<int, volatile int>::value;
+  EXPECT_TRUE(t1);
+  EXPECT_FALSE(t2);
+  EXPECT_FALSE(t3);
+  EXPECT_FALSE(t4);
+  EXPECT_FALSE(t5);
+  EXPECT_FALSE(t6);
+  EXPECT_FALSE(t7);
+}
+
+TEST(test_types, is_same_v) {
+  bool t1 = is_same_v<int, int>;
+  bool t2 = is_same_v<int, double>;
+  bool t3 = is_same_v<int, int *>;
+  bool t4 = is_same_v<int, int &>;
+  bool t5 = is_same_v<int, int &&>;
+  bool t6 = is_same_v<int, const int>;
+  bool t7 = is_same_v<int, volatile int>;
   EXPECT_TRUE(t1);
   EXPECT_FALSE(t2);
   EXPECT_FALSE(t3);
@@ -46,10 +63,10 @@ TEST(test_types, check_type_equivalent) {
 }
 
 TEST(test_types, remove_const_and_volatile) {
-  bool t1 = same_t<int, sqrl::remove_cv<int>::type>::value;
-  bool t2 = same_t<int, sqrl::remove_cv<const int>::type>::value;
-  bool t3 = same_t<int, sqrl::remove_cv<volatile int>::type>::value;
-  bool t4 = same_t<int, sqrl::remove_cv<const volatile int>::type>::value;
+  bool t1 = is_same<int, sqrl::remove_cv<int>::type>::value;
+  bool t2 = is_same<int, sqrl::remove_cv<const int>::type>::value;
+  bool t3 = is_same<int, sqrl::remove_cv<volatile int>::type>::value;
+  bool t4 = is_same<int, sqrl::remove_cv<const volatile int>::type>::value;
   EXPECT_TRUE(t1);
   EXPECT_TRUE(t2);
   EXPECT_TRUE(t3);
@@ -59,8 +76,8 @@ TEST(test_types, remove_const_and_volatile) {
 TEST(test_types, conditional_choose_types) {
   using type1 = sqrl::conditional<true, int, double>::type;
   using type2 = sqrl::conditional<false, int, double>::type;
-  bool t1 = same_t<type1, int>::value;
-  bool t2 = same_t<type2, double>::value;
+  bool t1 = is_same<type1, int>::value;
+  bool t2 = is_same<type2, double>::value;
   EXPECT_TRUE(t1);
   EXPECT_TRUE(t2);
 }
@@ -69,9 +86,9 @@ TEST(test_types, remove_reference) {
   using type1 = sqrl::remove_reference<int>::type;
   using type2 = sqrl::remove_reference<int &>::type;
   using type3 = sqrl::remove_reference<int &&>::type;
-  bool t1 = same_t<type1, int>::value;
-  bool t2 = same_t<type2, int>::value;
-  bool t3 = same_t<type3, int>::value;
+  bool t1 = is_same<type1, int>::value;
+  bool t2 = is_same<type2, int>::value;
+  bool t3 = is_same<type3, int>::value;
   EXPECT_TRUE(t1);
   EXPECT_TRUE(t2);
   EXPECT_TRUE(t3);
@@ -81,9 +98,9 @@ TEST(test_types, remove_array) {
   using type1 = sqrl::remove_array<int>::type;
   using type2 = sqrl::remove_array<int[]>::type;
   using type3 = sqrl::remove_array<int[3]>::type;
-  bool t1 = same_t<type1, int>::value;
-  bool t2 = same_t<type2, int>::value;
-  bool t3 = same_t<type3, int>::value;
+  bool t1 = is_same<type1, int>::value;
+  bool t2 = is_same<type2, int>::value;
+  bool t3 = is_same<type3, int>::value;
   EXPECT_TRUE(t1);
   EXPECT_TRUE(t2);
   EXPECT_TRUE(t3);
@@ -94,10 +111,10 @@ TEST(test_types, remove_pointer) {
   using type2 = sqrl::remove_pointer<int *>::type;
   using type3 = sqrl::remove_pointer<const int *>::type;
   using type4 = sqrl::remove_pointer<int *const>::type;
-  bool t1 = same_t<type1, int>::value;
-  bool t2 = same_t<type2, int>::value;
-  bool t3 = same_t<type3, int>::value;
-  bool t4 = same_t<type4, int>::value;
+  bool t1 = is_same<type1, int>::value;
+  bool t2 = is_same<type2, int>::value;
+  bool t3 = is_same<type3, int>::value;
+  bool t4 = is_same<type4, int>::value;
   EXPECT_TRUE(t1);
   EXPECT_TRUE(t2);
   EXPECT_TRUE(t3);
@@ -137,11 +154,11 @@ TEST(test_types, decay_types) {
   using type3 = sqrl::decay<const int>::type;
   using type4 = sqrl::decay<int[]>::type;
   using type5 = sqrl::decay<int(int)>::type;
-  bool t1 = same_t<type1, int>::value;
-  bool t2 = same_t<type2, int>::value;
-  bool t3 = same_t<type3, int>::value;
-  bool t4 = same_t<type4, int *>::value;
-  bool t5 = same_t<type5, int (*)(int)>::value;
+  bool t1 = is_same<type1, int>::value;
+  bool t2 = is_same<type2, int>::value;
+  bool t3 = is_same<type3, int>::value;
+  bool t4 = is_same<type4, int *>::value;
+  bool t5 = is_same<type5, int (*)(int)>::value;
   EXPECT_TRUE(t1);
   EXPECT_TRUE(t2);
   EXPECT_TRUE(t3);
@@ -164,8 +181,8 @@ TEST(test_types, result_of) {
   auto f = [](int a) -> int { return a + 1; };
   using type1 = result_of<decltype(f)(int)>::type;
   using type2 = result_of<decltype (&func)(int)>::type;
-  bool t1 = same_t<type1, int>::value;
-  bool t2 = same_t<type2, int>::value;
+  bool t1 = is_same<type1, int>::value;
+  bool t2 = is_same<type2, int>::value;
   EXPECT_TRUE(t1);
   EXPECT_TRUE(t2);
 }
