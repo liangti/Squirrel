@@ -5,10 +5,10 @@
 #include <functional>
 #include <future>
 #include <mutex>
-#include <queue>
 #include <utility>
 
 #include <async/future.h>
+#include <container/queue.h>
 #include <container/vector.h>
 #include <functional/function.h>
 #include <metaprogramming/types.h>
@@ -38,7 +38,7 @@ public:
 private:
   typedef sqrl::Vector<sqrl::Thread *> Threads;
   Threads workers;
-  std::queue<Task> tasks;
+  sqrl::Queue<Task> tasks;
   std::mutex lock;
   std::condition_variable condition;
   bool begin;
