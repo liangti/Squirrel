@@ -3,13 +3,13 @@
 
 using namespace sqrl;
 
-class _test_allocator : _deleter_default {
+class _test_allocator : _default_deleter {
 private:
   static size_t _free_size;
 
 public:
   template <typename T> static void clean(T *data) {
-    _deleter_default::clean(data);
+    _default_deleter::clean(data);
     _free_size += sizeof(T);
   }
   static size_t get_free_size() { return _free_size; }

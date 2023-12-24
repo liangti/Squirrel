@@ -60,7 +60,7 @@ private:
   bool future_already_retrieved;
 
 public:
-  Promise() : state(new sqrl::_SharedState<T>()) {
+  Promise() : state(sqrl::make_shared<_SharedState<T>>()) {
     future_already_retrieved = false;
   }
   Promise(const Promise<T> &) = delete;

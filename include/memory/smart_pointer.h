@@ -8,14 +8,14 @@ namespace sqrl {
 
 // by default use delete since unique_ptr has no idea
 // what allocator input pointer is using
-class _deleter_default {
+struct _default_deleter {
 public:
   template <class T> static void clean(T *data) { delete data; }
 };
 
 // smart pointers expose to users
 
-template <class T, class Deleter = _deleter_default> class unique_ptr {
+template <class T, class Deleter = _default_deleter> class unique_ptr {
 private:
   T *ptr;
 
@@ -61,7 +61,7 @@ public:
 
 template <class T> class weak_ptr;
 
-template <class T, class Deleter = _deleter_default> class shared_ptr {
+template <class T, class Deleter = _default_deleter> class shared_ptr {
   friend weak_ptr<T>;
 
 private:
@@ -205,18 +205,9 @@ public:
 };
 
 // implement make_unique and make_shared
-// make_xxx are all using sqrl::Allocator to manage memory
-template <class T> class _make_deleter {
-
-public:
-  static void clean(T *data) {
-    sqrl::Allocator<T> allocator;
-    allocator.deallocate(data, 1);
-  }
-};
 
 template <class T> struct unique_t {
-  typedef sqrl::unique_ptr<T, _make_deleter<T>> type;
+  typedef sqrl::unique_ptr<T, _default_deleter> type;
 };
 
 template <class T> struct unique_t<T[]> {
@@ -236,14 +227,12 @@ template <class T> struct unique_t<T *> {
 
 template <class T, class... Args>
 typename unique_t<T>::type make_unique(Args &&...args) {
-  sqrl::Allocator<T> local_allocator;
-  T *slot = local_allocator.allocate(sizeof(T));
-  T *init = new (slot) T(std::forward<Args>(args)...);
-  return unique_ptr<T, _make_deleter<T>>(init);
+  T *init = new T(std::forward<Args>(args)...);
+  return unique_ptr<T>(init);
 }
 
 template <class T> struct shared_t {
-  typedef sqrl::shared_ptr<T, _make_deleter<T>> type;
+  typedef sqrl::shared_ptr<T, _default_deleter> type;
 };
 
 template <class T> struct shared_t<T[]> {
@@ -263,11 +252,25 @@ template <class T> struct shared_t<T *> {
 
 template <class T, class... Args>
 typename shared_t<T>::type make_shared(Args &&...args) {
-  sqrl::Allocator<T> local_allocator;
-  T *slot = local_allocator.allocate(sizeof(T));
-  T *init = new (slot) T(std::forward<Args>(args)...);
-  return shared_ptr<T, _make_deleter<T>>(init);
+  T *init = new T(std::forward<Args>(args)...);
+  return shared_ptr<T>(init);
 }
+
+// TODO: implement alloc_unique & alloc_shared
+// to use sqrl::Allocator to allocate and delete
+struct _alloc_allocator {
+  template <class T> static T *allocate() {
+    sqrl::Allocator<T> local_allocator;
+    T *slot = local_allocator.allocate(sizeof(T));
+    return slot;
+  }
+};
+struct _alloc_deleter {
+  template <class T> static void clean(T *data) {
+    sqrl::Allocator<T> allocator;
+    allocator.deallocate(data, 1);
+  }
+};
 
 }; // namespace sqrl
 
