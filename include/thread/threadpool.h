@@ -2,8 +2,6 @@
 #define INCLUDED_THREADPOOL_H
 
 #include <condition_variable>
-#include <functional>
-#include <future>
 #include <mutex>
 #include <utility>
 
