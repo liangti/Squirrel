@@ -6,6 +6,7 @@
 
 #include <functional/function.h>
 #include <memory/smart_pointer.h>
+#include <metaprogramming/types.h>
 
 namespace sqrl {
 
@@ -17,6 +18,17 @@ template <class T> struct _SharedState {
   std::mutex mutex;
   std::condition_variable cvar;
 };
+
+template <> struct _SharedState<void> {
+  bool ready;
+  std::mutex mutex;
+  std::condition_variable cvar;
+};
+
+// for avoiding void as parameter type of Promise::set_value
+template <class T> struct _type_selector { using type = T; };
+
+template <> struct _type_selector<void> { using type = std::nullptr_t; };
 
 }; // namespace details
 
@@ -48,9 +60,21 @@ public:
       state->cvar.wait(lock);
     }
   }
+  bool ready() {
+    if (!valid()) {
+      return false;
+    }
+    std::lock_guard<std::mutex> lock(state->mutex);
+    return state->ready;
+  }
   T get() {
     wait();
-    return state->value;
+    if constexpr (sqrl::same_t<T, void>::value) {
+      return;
+    }
+    if constexpr (!sqrl::same_t<T, void>::value) {
+      return state->value;
+    }
   }
 };
 
@@ -74,9 +98,18 @@ public:
     other.state = nullptr;
     return *this;
   }
-  void set_value(T value) {
+  void set_value(typename _type_selector<T>::type value) {
+    static_assert(!sqrl::same_t<T, void>::value,
+                  "Promise<void> should use set_value()");
     std::lock_guard<std::mutex> lock(state->mutex);
     state->value = value;
+    state->ready = true;
+    state->cvar.notify_all();
+  }
+
+  void set_value() {
+    static_assert(sqrl::same_t<T, void>::value,
+                  "Promise<T> while T is not void should not use set_value()");
     state->ready = true;
     state->cvar.notify_all();
   }
@@ -105,7 +138,13 @@ public:
     // issue: how capture arguments copy/move by std::function
     task = [functor = std::forward<F>(f)](Promise<Result> promise,
                                           Args &&...args) mutable {
-      promise.set_value(functor(std::forward<Args>(args)...));
+      if constexpr (sqrl::same_t<Result, void>::value) {
+        functor(std::forward<Args>(args)...);
+        promise.set_value();
+      }
+      if constexpr (!sqrl::same_t<Result, void>::value) {
+        promise.set_value(functor(std::forward<Args>(args)...));
+      }
     };
   }
   PackageTask(const PackageTask &) = delete;

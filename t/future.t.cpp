@@ -22,10 +22,18 @@ TEST(future_test_basic, get_future_more_than_once_will_fail) {
   EXPECT_FALSE(future2.valid());
 }
 
+TEST(future_test_basic, void) {
+  Promise<void> promise;
+  Future<void> future = promise.get_future();
+  promise.set_value();
+  EXPECT_TRUE(future.ready());
+}
+
 TEST(future_test_sync, basic) {
   Promise<int> promise;
   Future<int> future = promise.get_future();
   promise.set_value(100);
+  EXPECT_TRUE(future.ready());
   EXPECT_EQ(future.get(), 100);
 }
 
@@ -34,6 +42,7 @@ TEST(future_test_async, basic) {
   Future<int> future = promise.get_future();
   std::thread task([&promise]() { promise.set_value(100); });
   task.join();
+  EXPECT_TRUE(future.ready());
   EXPECT_EQ(future.get(), 100);
 }
 
@@ -43,6 +52,7 @@ TEST(package_task_test_sync, basic) {
   PackageTask<int(int, int)> scheduler(add);
   Future<int> future = scheduler.get_future();
   scheduler(1, 2);
+  EXPECT_TRUE(future.ready());
   EXPECT_EQ(future.get(), 3);
 }
 
@@ -51,5 +61,21 @@ TEST(package_task_test_async, basic) {
   Future<int> future = scheduler.get_future();
   std::thread task(std::move(scheduler), 1, 2);
   task.join();
+  EXPECT_TRUE(future.ready());
   EXPECT_EQ(future.get(), 3);
+}
+
+TEST(package_task_test_sync, void) {
+  PackageTask<void()> scheduler([]() {});
+  Future<void> future = scheduler.get_future();
+  scheduler();
+  EXPECT_TRUE(future.ready());
+}
+
+TEST(package_task_test_async, void) {
+  PackageTask<void()> scheduler([]() {});
+  Future<void> future = scheduler.get_future();
+  std::thread task(std::move(scheduler));
+  task.join();
+  EXPECT_TRUE(future.ready());
 }

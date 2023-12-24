@@ -18,7 +18,7 @@ TEST_P(ThreadPoolTest, no_task) {
 TEST_P(ThreadPoolTest, simple_add_task) {
   ThreadPool tp;
   tp.start();
-  tp.enqueue([]() { return 0; });
+  tp.enqueue([]() {});
   tp.stop();
   ASSERT_EQ(tp.get_handled_tasks_num(), 1);
 }
@@ -36,7 +36,7 @@ TEST_P(ThreadPoolTest, add_task_change_local_var) {
 }
 
 TEST_P(ThreadPoolTest, add_tasks_more_than_pool_size) {
-  auto func = []() { return 0; };
+  auto func = []() {};
   ThreadPool tp;
   int tasks_num = tp.get_pool_size() + 1;
   tp.start();
