@@ -12,6 +12,11 @@ TEST(future_test_basic, all_movable) {
   Future<int> future2 = std::move(future1);
   EXPECT_FALSE(future1.valid());
   EXPECT_TRUE(future2.valid());
+  EXPECT_FALSE(future1.ready());
+  EXPECT_FALSE(future2.ready());
+#ifdef __SQRL_TEST_EXPECT_COMPILE_TIME_FAILURE
+  promise.set_value();
+#endif
 }
 
 TEST(future_test_basic, get_future_more_than_once_will_fail) {
@@ -20,6 +25,8 @@ TEST(future_test_basic, get_future_more_than_once_will_fail) {
   Future<int> future2 = promise.get_future();
   EXPECT_TRUE(future1.valid());
   EXPECT_FALSE(future2.valid());
+  EXPECT_FALSE(future1.ready());
+  EXPECT_FALSE(future2.ready());
 }
 
 TEST(future_test_basic, void) {
@@ -27,6 +34,9 @@ TEST(future_test_basic, void) {
   Future<void> future = promise.get_future();
   promise.set_value();
   EXPECT_TRUE(future.ready());
+#ifdef __SQRL_TEST_EXPECT_COMPILE_TIME_FAILURE
+  promise.set_value(void);
+#endif
 }
 
 TEST(future_test_sync, basic) {
