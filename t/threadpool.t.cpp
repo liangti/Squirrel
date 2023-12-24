@@ -27,13 +27,16 @@ TEST_P(ThreadPoolTest, add_task_change_local_var) {
   ThreadPool tp;
   int *local = new int(1);
   tp.start();
-  tp.enqueue([local]() { *local = 3; });
+  tp.enqueue([local]() {
+    *local = 3;
+    return 0;
+  });
   tp.stop();
   ASSERT_EQ(*local, 3);
 }
 
 TEST_P(ThreadPoolTest, add_tasks_more_than_pool_size) {
-  auto func = []() {};
+  auto func = []() { return 0; };
   ThreadPool tp;
   int tasks_num = tp.get_pool_size() + 1;
   tp.start();

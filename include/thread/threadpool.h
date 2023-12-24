@@ -9,8 +9,9 @@
 #include <utility>
 #include <vector>
 
-#include <metaprogramming/types.h>
+#include <async/future.h>
 #include <functional/function.h>
+#include <metaprogramming/types.h>
 #include <thread/thread.h>
 
 namespace sqrl {
@@ -24,7 +25,7 @@ public:
 
   template <class T, class... Args>
   auto enqueue(T &&t, Args &&...args)
-      -> std::future<typename sqrl::result_of<T(Args...)>::type>;
+      -> sqrl::Future<typename sqrl::result_of<T(Args...)>::type>;
 
   // remove copy methods
   ThreadPool(const ThreadPool &) = delete;
@@ -46,12 +47,12 @@ private:
 };
 template <class T, class... Args>
 auto ThreadPool::enqueue(T &&t, Args &&...args)
-    -> std::future<typename sqrl::result_of<T(Args...)>::type> {
+    -> sqrl::Future<typename sqrl::result_of<T(Args...)>::type> {
   using return_type = typename sqrl::result_of<T(Args...)>::type;
 
-  auto task = std::make_shared<std::packaged_task<return_type()>>(
+  auto task = std::make_shared<sqrl::PackageTask<return_type()>>(
       std::bind(std::forward<T>(t), std::forward<Args>(args)...));
-  std::future<return_type> result = task->get_future();
+  sqrl::Future<return_type> result = task->get_future();
   {
     std::unique_lock<std::mutex> guard(lock);
     tasks.emplace([task]() { (*task)(); });
