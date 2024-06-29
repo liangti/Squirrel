@@ -81,9 +81,6 @@ TEST(test_string_basic, move_assignment) {
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wself-assign-overloaded"
-#elif __GNUC__
-#pragma gcc diagnostic push
-#pragma gcc diagnostic ignored "-Wself-assign-overloaded"
 #endif
 TEST(test_string_basic, copy_self_assignment) {
   String s("abc");
@@ -95,15 +92,15 @@ TEST(test_string_basic, copy_self_assignment) {
 #ifdef __clang__
 #pragma clang diagnostic pop
 #elif __GNUC__
-#pragma gcc diagnostic pop
+#pragma GCC diagnostic pop
 #endif
 
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wself-move"
 #elif __GNUC__
-#pragma gcc diagnostic push
-#pragma gcc diagnostic ignored "-Wself-assign-overloaded"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
 #endif
 TEST(test_string_basic, move_self_assignment) {
   String s("abc");
@@ -115,7 +112,7 @@ TEST(test_string_basic, move_self_assignment) {
 #ifdef __clang__
 #pragma clang diagnostic pop
 #elif __GNUC__
-#pragma gcc diagnostic pop
+#pragma GCC diagnostic pop
 #endif
 
 TEST(test_string_basic, string_concatenation) {

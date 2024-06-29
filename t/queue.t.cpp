@@ -26,10 +26,10 @@ public:
 };
 
 static int reference_count = 0;
-class C{
+class C {
 public:
   C(int x) : data(new int(x)) { reference_count++; }
-  ~C() { 
+  ~C() {
     reference_count--;
     delete data;
   }
@@ -50,20 +50,20 @@ TEST(test_queue, cycle_push_pop) {
   Queue<int> q(full_size);
   // make queue._head in the middle
   size_t init_size = 20;
-  for (int i = 0; i < init_size; i++) {
+  for (size_t i = 0; i < init_size; i++) {
     EXPECT_FALSE(q.full());
     q.push(i);
   }
-  for (int i = 0; i < init_size; i++) {
+  for (size_t i = 0; i < init_size; i++) {
     ASSERT_EQ(q.front(), i);
     q.pop();
   }
   // make queue._tail go back and before queue._head
-  for (int i = 0; i < full_size; i++) {
+  for (size_t i = 0; i < full_size; i++) {
     EXPECT_FALSE(q.full());
     q.push(i);
   }
-  for (int i = 0; i < full_size; i++) {
+  for (size_t i = 0; i < full_size; i++) {
     ASSERT_EQ(q.front(), i);
     q.pop();
   }
@@ -72,12 +72,12 @@ TEST(test_queue, cycle_push_pop) {
 
 TEST(test_queue, init_does_not_require_default_constructor) {
   Queue<A> q(50);
-  for (int i = 0; i < 50; i++) {
+  for (size_t i = 0; i < 50; i++) {
     A temp(i);
     q.push(temp);
   }
   ASSERT_EQ(q.size(), 50);
-  for (int i = 0; i < 50; i++) {
+  for (size_t i = 0; i < 50; i++) {
     ASSERT_EQ((*q.front().data), i);
     q.pop();
   }
@@ -87,11 +87,11 @@ TEST(test_queue, init_does_not_require_default_constructor) {
 
 TEST(test_queue, emplace_does_no_copy) {
   Queue<B> q(50);
-  for (int i = 0; i < 50; i++) {
+  for (size_t i = 0; i < 50; i++) {
     q.emplace(i);
   }
   ASSERT_EQ(q.size(), 50);
-  for (int i = 0; i < 50; i++) {
+  for (size_t i = 0; i < 50; i++) {
     ASSERT_EQ((*q.front().data), i);
     q.pop();
   }
@@ -99,10 +99,10 @@ TEST(test_queue, emplace_does_no_copy) {
   ASSERT_EQ(viewer.memory_size(), align(sizeof(A) * Q_SIZE));
 }
 
-TEST(test_queue, call_destructor_and_free_memory){
+TEST(test_queue, call_destructor_and_free_memory) {
   {
     Queue<C> q(50);
-    for (int i = 0; i < 40; i++) {
+    for (size_t i = 0; i < 40; i++) {
       q.emplace(i);
     }
     ASSERT_EQ(reference_count, 40); // there are only 40 items

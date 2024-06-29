@@ -18,7 +18,7 @@ public:
   String &operator=(const String &);
   String &operator=(String &&);
   String operator+(const String &);
-  bool operator==(const String &);
+  bool operator==(const String &) const;
   const char *c_str();
   size_t size();
 

@@ -163,11 +163,11 @@ TEST(test_vector, emplace_back_compatible_with_normal_item) {
 TEST(test_vector, initialize_with_no_default_constructor_object) {
   Vector<NoMove> v;
   size_t test_size = 20;
-  for (int i = 0; i < test_size; i++) {
+  for (size_t i = 0; i < test_size; i++) {
     v.emplace_back(i);
   }
   EXPECT_EQ(v.size(), test_size);
-  for (int i = 0; i < test_size; i++) {
+  for (size_t i = 0; i < test_size; i++) {
     EXPECT_EQ(*(v[i].data), i);
   }
 }
@@ -178,11 +178,11 @@ TEST(test_vector, emplace_back_does_no_copy) {
   // make size smaller than vector original size
   // to avoid resize()
   size_t test_size = 20;
-  for (int i = 0; i < test_size; i++) {
+  for (size_t i = 0; i < test_size; i++) {
     v.emplace_back(i);
   }
   EXPECT_EQ(v.size(), test_size);
-  for (int i = 0; i < test_size; i++) {
+  for (size_t i = 0; i < test_size; i++) {
     EXPECT_EQ(*(v[i].data), i);
   }
 }
@@ -190,12 +190,12 @@ TEST(test_vector, emplace_back_does_no_copy) {
 TEST_F(SafeVectorTest, destructor_is_called) {
   Vector<NoMove> v;
   size_t test_size = 2000; // explicitly trigger resize
-  for (int i = 0; i < test_size; i++) {
+  for (size_t i = 0; i < test_size; i++) {
     v.emplace_back(i);
   }
   EXPECT_EQ(reference_count, 2000);
   EXPECT_EQ(v.size(), test_size);
-  for (int i = 0; i < test_size; i++) {
+  for (size_t i = 0; i < test_size; i++) {
     EXPECT_EQ(*(v[i].data), i);
   }
 }
@@ -205,7 +205,7 @@ TEST_F(SafeVectorTest, destructor_is_called) {
 TEST_F(SafeVectorTest, clear) {
   Vector<NoMove> v;
   size_t test_size = 20;
-  for (int i = 0; i < test_size; i++) {
+  for (size_t i = 0; i < test_size; i++) {
     v.emplace_back(i);
   }
   EXPECT_EQ(reference_count, 20);

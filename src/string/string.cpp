@@ -125,7 +125,7 @@ String String::operator+(const String &other) {
   return String(temp);
 }
 
-bool String::operator==(const String &other) {
+bool String::operator==(const String &other) const {
   if (s_len != other.s_len) {
     return false;
   }
