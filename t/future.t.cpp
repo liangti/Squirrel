@@ -29,6 +29,18 @@ TEST(future_test_basic, get_future_more_than_once_will_fail) {
   EXPECT_FALSE(future2.ready());
 }
 
+TEST(future_test_base, promise_move_get_future_state) {
+  Promise<int> promise;
+  Future<int> future1 = promise.get_future();
+  // promise2 should have same `future_already_retrieved` state as promise
+  Promise<int> promise2 = std::move(promise);
+  Future<int> future2 = promise2.get_future();
+  EXPECT_TRUE(future1.valid());
+  EXPECT_FALSE(future2.valid());
+  EXPECT_FALSE(future1.ready());
+  EXPECT_FALSE(future2.ready());
+}
+
 TEST(future_test_basic, void) {
   Promise<void> promise;
   Future<void> future = promise.get_future();

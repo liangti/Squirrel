@@ -84,12 +84,13 @@ private:
   bool future_already_retrieved;
 
 public:
-  Promise() : state(sqrl::make_shared<_SharedState<T>>()) {
-    future_already_retrieved = false;
-  }
+  Promise()
+      : state(sqrl::make_shared<_SharedState<T>>()),
+        future_already_retrieved(false) {}
   Promise(const Promise<T> &) = delete;
   Promise(Promise<T> &&other) {
     state = other.state;
+    future_already_retrieved = other.future_already_retrieved;
     other.state = nullptr;
   }
   Promise<T> &operator=(const Promise<T> &) = delete;
