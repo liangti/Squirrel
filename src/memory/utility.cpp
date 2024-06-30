@@ -14,10 +14,13 @@ BlockAgent::BlockAgent(BlockAgent &&other) {
   other._block = nullptr;
 }
 BlockAgent::BlockAgent(const BlockAgent &other) { _block = other._block; }
+
 BlockAgent BlockAgent::operator=(BlockAgent &&other) {
   _block = other._block;
   other._block = nullptr;
+  return *this;
 }
+
 bool BlockAgent::operator==(const BlockAgent &other) const {
   return _block == other._block;
 }
