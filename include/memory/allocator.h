@@ -1,39 +1,27 @@
 #ifndef INCLUDED_MEMORY_ALLOCATOR_H
 #define INCLUDED_MEMORY_ALLOCATOR_H
-#include <memory/utility.h>
+#include <memory/_allocator_impl.h>
 
 namespace sqrl {
 
-class AllocatorImpl;
-
-class AllocatorBase {
-private:
-  AllocatorImpl *impl;
-
-public:
-  AllocatorBase();
-  word_t *allocate(size_t);
-  void deallocate(word_t *);
-};
-
 // allocator interface
-template <typename T> class Allocator {
+template <typename T, typename Impl> class AllocatorInterface {
 private:
   int x;
 
 public:
-  AllocatorBase base;
+  Impl impl;
   [[nodiscard("Memory leak")]] virtual T *allocate(size_t size) {
-    return (T *)base.allocate(size * sizeof(T));
+    return (T *)impl.allocate(size * sizeof(T));
   }
   virtual void deallocate(T *t, size_t size) {
-    for (size_t itr = 0; itr < size; itr++){
-      base.deallocate((word_t *)t);
-      t++;
-    }
+    // size is unused, for compatible with std API
+    impl.deallocate((word_t *)t);
   }
-  virtual ~Allocator() {}
+  virtual ~AllocatorInterface() {}
 };
+
+template <typename T> using Allocator = AllocatorInterface<T, AllocatorImpl>;
 
 }; // namespace sqrl
 

@@ -8,6 +8,7 @@
 #define word_t intptr_t
 #define block_t struct Block
 #define block_header_t struct BlockHeader
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,9 +41,18 @@ size_t align(size_t);
 
 size_t alloc_size(size_t);
 
-block_t *request_from_os(size_t);
+block_t *request_block_from_os(size_t);
 
-block_t *get_header(word_t *);
+block_t *request_large_block_from_os(size_t);
+
+void release_block(block_t *block);
+
+// 0 for successful completion, -1 for fail
+int release_large_block_to_os(block_t *block);
+
+block_header_t *get_header(word_t *);
+
+block_t *get_block(word_t *);
 
 void split(block_t *, size_t);
 
@@ -57,9 +67,9 @@ void used_clear(block_t *);
 
 void used_set(block_t *);
 
-size_t size_get(block_t *);
+size_t get_size(block_t *);
 
-void size_set(block_t *, size_t);
+void set_size(block_t *, size_t);
 
 #ifdef __cplusplus
 }

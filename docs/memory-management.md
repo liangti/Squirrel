@@ -28,6 +28,13 @@ Implement in C.
   - split block
   - coalesce block 
 
+**Details**
+
+By default it uses `sbrk` to ask for new memory from OS, and will not return to OS until
+program exits
+
+For large block of memory it uses `mmap`, and will return memory to OS in release method
+
 **Goal**:
 
 - performance first
@@ -38,17 +45,19 @@ Implement in C.
 - implement allocation strategy
 - manage blocks
 
+## Allocator Implementation
 
+`_allocator_impl.h`
 
-## Utility
-
-*May rename it in the future*
-
-The goal is to provide a C++ API to manipulate blocks.
+Default implementation of allocator
 
 *NO* other modules other than utility should directly talk to block C API.
 
-Memory allocator is built on top of it.
+This component contains:
+- AllocatorDefaultImpl
+- BlockAgent
+- BlockManager
+- BlockViewer
 
 ### BlockAgent
 
@@ -74,38 +83,11 @@ Please notice that any operation directly on block should implement in block C m
 
 ### BlockViewer
 
-*May rename it in the future*
-
-Do not own any block but can view the memory state.
+Do not own/change any block but can view the memory state.
 
 Potentially it provides users a more insightful view of their memory allocation
 
-U
 
-## Allocator
+## Allocator Interface
 
-The allocator is a reusable template to allocate memory for need.
-
-It *should* make use of BlockManager to manipulate block.
-
-It *could* implement its own memory allocation strategy, such as
-
-- find free block before ask for a new one
-
-In theory, it *should NOT* directly modify any block, such as
-
-- split the block
-- coalesce two free blocks
-
-The principle is to let each allocation as fast as possible.
-
-## Reclaimer
-
-The memory reclaimer is for re-construct memory blocks for allocator.
-
-Those operation should not be done in allocator since allocator has performance requirement.
-
-The run of reclaimer is open for discussion, there are two potential options:
-
-- in series, run it every N allocation(N is not determined yet)
-- in parallel, run it in separate thread
+`allocator.h` provides basic interface(compatible with std::allocator)

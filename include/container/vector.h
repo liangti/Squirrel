@@ -5,6 +5,8 @@
 #include <memory/allocator.h>
 #include <memory/destroy.h>
 
+#define SQRL_VECTOR_DEFAULT_INIT_SIZE 50
+
 namespace sqrl {
 
 template <typename T> class Vector {
@@ -107,7 +109,7 @@ protected:
   size_t _top;
   T *_begin;
   T *_end;
-  void _init_space(size_t capacity = 50) {
+  void _init_space(size_t capacity = SQRL_VECTOR_DEFAULT_INIT_SIZE) {
     _capacity = capacity;
     _top = 0;
     _begin = _allocate(capacity);
@@ -118,7 +120,7 @@ protected:
   T *_allocate(size_t capacity) { return _allocator.allocate(capacity); }
   void _deallocate() {
     destroy_n(_begin, _top);
-    _allocator.deallocate(_begin, 1); // Vector allocate a whole block of memory
+    _allocator.deallocate(_begin, _capacity);
   }
   void _check_size(size_t required) {
     if (required > _capacity) {

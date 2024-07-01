@@ -1,9 +1,7 @@
 #include <container/vector.h>
 #include <gtest/gtest.h>
-#include <memory/utility.h>
+#include <memory/_allocator_impl.h>
 #include <metaprogramming/types.h>
-
-#define V_SIZE 50
 
 using namespace sqrl;
 
@@ -42,14 +40,18 @@ struct NoCopy {
 // to ensure vector release resource correctly
 class SafeVectorTest : public ::testing::Test {
 protected:
-  void SetUp() { reference_count = 0; }
+  void SetUp() {
+    reference_count = 0;
+    EXPECT_EQ(viewer.memory_size(), 0);
+  }
   void TearDown() {
     EXPECT_EQ(reference_count, 0);
     reference_count = 0;
+    EXPECT_EQ(viewer.memory_size(), 0);
   }
 };
 
-TEST(test_vector, simple_create_access) {
+TEST_F(SafeVectorTest, simple_create_access) {
   Vector<int> v;
   v.push_back(1);
   v.push_back(2);
@@ -58,60 +60,43 @@ TEST(test_vector, simple_create_access) {
   EXPECT_EQ(v[1], 2);
   EXPECT_EQ(v[2], 3);
   EXPECT_EQ(v.size(), 3);
-  EXPECT_EQ(viewer.memory_size(), align(sizeof(int) * V_SIZE));
+  EXPECT_EQ(viewer.memory_size(),
+            alloc_size(sizeof(int) * SQRL_VECTOR_DEFAULT_INIT_SIZE));
 }
 
-TEST(test_vector, resize_when_exceed_capacity) {
-  {
-    Vector<int> v;
-    size_t test_size = 2000;
-    size_t vector_size = V_SIZE;
-    for (size_t i = 0; i < test_size; i++) {
-      v.push_back(i);
-      // mock resize behavior
-      if (i > vector_size) {
-        vector_size *= 2;
-      }
-    }
-    EXPECT_EQ(v.size(), test_size);
-    for (size_t i = 0; i < test_size; i++) {
-      EXPECT_EQ(v[i], i);
-    }
-    EXPECT_EQ(viewer.memory_size(), align(sizeof(int) * vector_size));
-  }
-  EXPECT_EQ(viewer.memory_size(), 0);
-}
-
-TEST(test_vector, initialize_by_initializer_list) {
+TEST_F(SafeVectorTest, initialize_by_initializer_list) {
   Vector<int> v = {1, 2, 3};
   EXPECT_EQ(v[0], 1);
   EXPECT_EQ(v[1], 2);
   EXPECT_EQ(v[2], 3);
   EXPECT_EQ(v.size(), 3);
 
-  EXPECT_EQ(viewer.memory_size(), align(sizeof(int) * V_SIZE));
+  EXPECT_EQ(viewer.memory_size(),
+            alloc_size(sizeof(int) * SQRL_VECTOR_DEFAULT_INIT_SIZE));
 }
 
-TEST(test_vector, vector_iterator) {
+TEST_F(SafeVectorTest, vector_iterator) {
   Vector<int> v = {1, 2, 3};
   size_t element = 1;
   for (auto itr = v.begin(); itr != v.end(); itr++) {
     EXPECT_EQ(*itr, element++);
   }
-  EXPECT_EQ(viewer.memory_size(), align(sizeof(int) * V_SIZE));
+  EXPECT_EQ(viewer.memory_size(),
+            alloc_size(sizeof(int) * SQRL_VECTOR_DEFAULT_INIT_SIZE));
 }
 
-TEST(test_vector, initialize_by_shallow_copy) {
+TEST_F(SafeVectorTest, initialize_by_shallow_copy) {
   Vector<int> v = {1, 2, 3};
   Vector<int> v2(v);
   size_t element = 1;
   for (auto itr = v.begin(); itr != v.end(); itr++) {
     EXPECT_EQ(*itr, element++);
   }
-  EXPECT_EQ(viewer.memory_size(), align(sizeof(int) * V_SIZE) * 2);
+  EXPECT_EQ(viewer.memory_size(),
+            alloc_size(sizeof(int) * SQRL_VECTOR_DEFAULT_INIT_SIZE) * 2);
 }
 
-TEST(test_vector, pop_back) {
+TEST_F(SafeVectorTest, pop_back) {
   Vector<int> v = {1, 2, 3};
   v.pop_back();
   EXPECT_EQ(v.size(), 2);
@@ -120,25 +105,28 @@ TEST(test_vector, pop_back) {
   EXPECT_EQ(v[0], 1);
   EXPECT_EQ(v[1], 2);
   EXPECT_EQ(v[2], 100);
-  EXPECT_EQ(viewer.memory_size(), align(sizeof(int) * V_SIZE));
+  EXPECT_EQ(viewer.memory_size(),
+            alloc_size(sizeof(int) * SQRL_VECTOR_DEFAULT_INIT_SIZE));
 }
 
-TEST(test_vector, initialize_by_iterator) {
+TEST_F(SafeVectorTest, initialize_by_iterator) {
   Vector<int> v = {1, 2, 3};
   Vector<int> v2(v.cbegin(), v.cend());
   size_t element = 1;
   for (auto itr = v.cbegin(); itr != v.cend(); itr++) {
     EXPECT_EQ(*itr, element++);
   }
-  EXPECT_EQ(viewer.memory_size(), align(sizeof(int) * V_SIZE) * 2);
+  EXPECT_EQ(viewer.memory_size(),
+            alloc_size(sizeof(int) * SQRL_VECTOR_DEFAULT_INIT_SIZE) * 2);
 }
 
-TEST(test_vector, pointer_element) {
+TEST_F(SafeVectorTest, pointer_element) {
   Vector<int *> v;
   int *i = new int(1);
   v.push_back(i);
   EXPECT_EQ(*(v[0]), 1);
-  EXPECT_EQ(viewer.memory_size(), align(sizeof(int *) * V_SIZE));
+  EXPECT_EQ(viewer.memory_size(),
+            alloc_size(sizeof(int *) * SQRL_VECTOR_DEFAULT_INIT_SIZE));
 }
 
 // it is hard to support reference type
@@ -213,4 +201,30 @@ TEST_F(SafeVectorTest, clear) {
   v.clear();
   EXPECT_EQ(reference_count, 0); // destructor is called
   EXPECT_EQ(v.size(), 0);
+}
+
+/*
+Caveat: after running this test, there will be a larger block
+So if a vector creation fall into this larger block
+so that memory_size() may be larger than Vector actual size.
+ */
+TEST_F(SafeVectorTest, resize_when_exceed_capacity) {
+  {
+    Vector<int> v;
+    size_t test_size = 2000;
+    size_t vector_size = SQRL_VECTOR_DEFAULT_INIT_SIZE;
+    for (size_t i = 0; i < test_size; i++) {
+      v.push_back(i);
+      // mock resize behavior
+      if (i > vector_size) {
+        vector_size *= 2;
+      }
+    }
+    EXPECT_EQ(v.size(), test_size);
+    for (size_t i = 0; i < test_size; i++) {
+      EXPECT_EQ(v[i], i);
+    }
+    EXPECT_EQ(viewer.memory_size(), alloc_size(sizeof(int) * vector_size));
+  }
+  EXPECT_EQ(viewer.memory_size(), 0);
 }

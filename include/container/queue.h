@@ -1,21 +1,20 @@
 #ifndef INCLUDED_QUEUE_H
 #define INCLUDED_QUEUE_H
 
-#define MAX_QUEUE_NUM 50
-#define QUEUE_BUFFER 2
-// buffer for requesting memory to make it a bit safer
-#define BUFFER 10000
-
 #include <memory/allocator.h>
 #include <memory/destroy.h>
 #include <utility>
+
+#define SQRL_QUEUE_DEFAULT_INIT_SIZE 50
 
 namespace sqrl {
 
 template <typename T> class Queue {
 public:
   // constructor
-  Queue(size_t queue_size = MAX_QUEUE_NUM) { _init_space(queue_size); }
+  Queue(size_t queue_size = SQRL_QUEUE_DEFAULT_INIT_SIZE) {
+    _init_space(queue_size);
+  }
 
   inline bool empty() { return _count == 0; }
 
@@ -35,7 +34,7 @@ public:
   }
 
   template <typename... Args> void emplace(Args &&...args) {
-    [[maybe_unused]]T *current = new (_root + _tail) T(std::forward<Args>(args)...);
+    new (_root + _tail) T(std::forward<Args>(args)...);
     _push();
   }
 
@@ -61,14 +60,11 @@ private:
   }
 
   // TODO: does it work fine with objects with virtual?
-  T *_allocate(size_t capacity) {
-    return _allocator.allocate(capacity +
-                               QUEUE_BUFFER); // 2 is for buffer for safe
-  }
+  T *_allocate(size_t capacity) { return _allocator.allocate(capacity); }
 
   void _deallocate(T *begin) {
     destroy_n(begin, _count);
-    _allocator.deallocate(begin, 1);
+    _allocator.deallocate(begin, _capacity);
   }
 
   inline void _push() {

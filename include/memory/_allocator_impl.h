@@ -1,8 +1,16 @@
-#ifndef INCLUDED_UTILITY_H
-#define INCLUDED_UTILITY_H
+#ifndef INCLUDED_ALLOCATOR_IMPL_H
+#define INCLUDED_ALLOCATOR_IMPL_H
+
+/*
+Internal implementation of allocator
+Not suppose to use directlly
+*/
 
 #include <map>
 #include <memory/block.h>
+
+// From M_MMAP_THRESHOLD from glibc
+#define SQRL_ALLOCATOR_MMAP_THRESHOLD 131072
 
 namespace sqrl {
 
@@ -35,13 +43,11 @@ public:
   BlockManager() = default;
   ~BlockManager() = default;
   void add_block(BlockAgent, bool);
-  void free_block(BlockData *);
+  // free a block from given data
+  void free_data(BlockData *);
   void split_block(BlockAgent, size_t);
   BlockAgent get_new_block(size_t);
-  BlockAgent get_head();
-  BlockAgent get_top();
   void clear();
-  bool safe_check();
 };
 
 /*
@@ -52,8 +58,29 @@ manipulation. It only view the memory block status
 class BlockViewer {
 public:
   BlockViewer() = default;
+  // for allocator users that don't care much implementation details
   size_t memory_size();
+  // used != requested, only when small block requested from os but not used
+  size_t memory_used_size();
+  size_t memory_requested_size();
+
   size_t block_number();
+  BlockAgent get_head();
+  BlockAgent get_top();
+  bool safe_check();
+};
+
+class AllocatorImpl {
+private:
+  BlockManager manager;
+  BlockViewer viewer;
+  BlockAgent find_free_block(size_t requested_size);
+
+public:
+  AllocatorImpl() = default;
+  word_t *allocate(size_t);
+  void deallocate(word_t *data);
+  ~AllocatorImpl() = default;
 };
 
 }; // namespace sqrl

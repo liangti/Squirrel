@@ -7,8 +7,8 @@ configure_file(
 
 foreach(
     TEST
-    memory-utils
-    memory-allocator
+    memory-allocator-impl
+    memory-block
     destroy
     dyn-cast
     function

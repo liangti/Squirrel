@@ -77,9 +77,7 @@ private:
     return _allocator.allocate(capacity + BUFFER);
   }
 
-  void _deallocate(T *begin) {
-    _allocator.deallocate(begin, 1);
-  }
+  void _deallocate(T *begin) { _allocator.deallocate(begin, 1); }
 };
 
 /*

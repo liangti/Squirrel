@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
+#include <memory/_allocator_impl.h>
 #include <memory/block.h>
-#include <memory/utility.h>
 #include <string/string.h>
 
 using namespace sqrl;
@@ -38,7 +38,7 @@ TEST(test_string_basic, simple_constructor) {
   String s("abc");
   ASSERT_STREQ(s.c_str(), "abc");
   ASSERT_EQ(s.size(), 3);
-  ASSERT_EQ(viewer.memory_size(), align(3));
+  ASSERT_EQ(viewer.memory_size(), alloc_size(3));
 }
 
 TEST(test_string_basic, copy_constructor) {
@@ -46,7 +46,7 @@ TEST(test_string_basic, copy_constructor) {
   String ss(s);
   ASSERT_STREQ(ss.c_str(), "abc");
   ASSERT_EQ(ss.size(), 3);
-  ASSERT_EQ(viewer.memory_size(), align(3) * 2);
+  ASSERT_EQ(viewer.memory_size(), alloc_size(3) * 2);
 }
 
 TEST(test_string_basic, move_constructor) {
@@ -56,7 +56,7 @@ TEST(test_string_basic, move_constructor) {
   EXPECT_TRUE(s.c_str() == nullptr);
   ASSERT_EQ(s.size(), 0);
   ASSERT_EQ(ss.size(), 3);
-  ASSERT_EQ(viewer.memory_size(), align(3));
+  ASSERT_EQ(viewer.memory_size(), alloc_size(3));
 }
 
 TEST(test_string_basic, copy_assignment) {
@@ -65,7 +65,7 @@ TEST(test_string_basic, copy_assignment) {
   ASSERT_STREQ(ss.c_str(), "abc");
   ASSERT_EQ(s.size(), 3);
   ASSERT_EQ(ss.size(), 3);
-  ASSERT_EQ(viewer.memory_size(), align(3) * 2);
+  ASSERT_EQ(viewer.memory_size(), alloc_size(3) * 2);
 }
 
 TEST(test_string_basic, move_assignment) {
@@ -75,7 +75,7 @@ TEST(test_string_basic, move_assignment) {
   EXPECT_TRUE(s.c_str() == nullptr);
   ASSERT_EQ(s.size(), 0);
   ASSERT_EQ(ss.size(), 3);
-  ASSERT_EQ(viewer.memory_size(), align(3));
+  ASSERT_EQ(viewer.memory_size(), alloc_size(3));
 }
 
 #ifdef __clang__
@@ -87,7 +87,7 @@ TEST(test_string_basic, copy_self_assignment) {
   s = s;
   ASSERT_STREQ(s.c_str(), "abc");
   ASSERT_EQ(s.size(), 3);
-  ASSERT_EQ(viewer.memory_size(), align(3));
+  ASSERT_EQ(viewer.memory_size(), alloc_size(3));
 }
 #ifdef __clang__
 #pragma clang diagnostic pop
@@ -107,7 +107,7 @@ TEST(test_string_basic, move_self_assignment) {
   s = std::move(s);
   ASSERT_STREQ(s.c_str(), "abc");
   ASSERT_EQ(s.size(), 3);
-  ASSERT_EQ(viewer.memory_size(), align(3));
+  ASSERT_EQ(viewer.memory_size(), alloc_size(3));
 }
 #ifdef __clang__
 #pragma clang diagnostic pop
