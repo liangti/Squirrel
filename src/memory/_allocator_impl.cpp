@@ -132,7 +132,7 @@ size_t BlockViewer::block_number() {
 
 // AllocatorImpl
 
-BlockAgent AllocatorImpl::find_free_block(size_t request_size) {
+BlockAgent GenericAllocator::find_free_block(size_t request_size) {
   auto block = viewer.get_head();
   auto size = alloc_size(request_size);
 
@@ -148,7 +148,7 @@ BlockAgent AllocatorImpl::find_free_block(size_t request_size) {
   return BlockAgent();
 }
 
-word_t *AllocatorImpl::allocate(size_t size) {
+word_t *GenericAllocator::allocate(size_t size) {
   bool is_new = false;
   BlockAgent block = find_free_block(size);
   if (block.null()) {
@@ -159,6 +159,8 @@ word_t *AllocatorImpl::allocate(size_t size) {
   return block.get_data();
 }
 
-void AllocatorImpl::deallocate(word_t *data) { manager.free_data(data); }
+void GenericAllocator::deallocate(word_t *data, size_t) {
+  manager.free_data(data);
+}
 
 }; // namespace sqrl

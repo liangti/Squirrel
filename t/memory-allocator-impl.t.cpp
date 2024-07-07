@@ -71,7 +71,7 @@ TEST_F(MemoryAllocatorTest, all_allocators_share_state) {
   ASSERT_EQ(viewer.memory_size(), 0);
   auto data = obj_allocator.allocate(1);
   ASSERT_EQ(viewer.memory_size(), alloc_size(sizeof(TestObj)));
-  obj_allocator.deallocate(data, 1);
+  allocator2.deallocate(data, 1);
   ASSERT_EQ(viewer.memory_size(), 0);
 }
 

@@ -70,17 +70,43 @@ public:
   bool safe_check();
 };
 
-class AllocatorImpl {
+/*
+Generaic Allocator will not consider object and its side,
+it will allocate exactly size user gives it.
+*/
+
+class GenericAllocator {
 private:
   BlockManager manager;
   BlockViewer viewer;
   BlockAgent find_free_block(size_t requested_size);
 
 public:
-  AllocatorImpl() = default;
+  GenericAllocator() = default;
+  // allocate given size of memory
   word_t *allocate(size_t);
-  void deallocate(word_t *data);
-  ~AllocatorImpl() = default;
+  // size is unused, for compatible with std API
+  void deallocate(word_t *data, size_t);
+  ~GenericAllocator() = default;
+};
+
+/*
+ObjectAllocator will consider object size
+*/
+
+template <typename T> class ObjectAllocator {
+private:
+  GenericAllocator impl;
+
+public:
+  ObjectAllocator() noexcept : impl(){};
+  // allocator {size} of object T
+  [[nodiscard("Memory leak")]] T *allocate(size_t size) {
+    return (T *)impl.allocate(size * sizeof(T));
+  }
+  // size is unused, for compatible with std API
+  void deallocate(T *t, size_t size) { impl.deallocate((word_t *)t, size); }
+  ~ObjectAllocator() noexcept = default;
 };
 
 }; // namespace sqrl
