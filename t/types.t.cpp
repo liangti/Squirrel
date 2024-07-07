@@ -21,6 +21,10 @@ typename enable_if<!is_array<T>::value, bool>::type is_array_v() {
 // for testing result_of
 int func(int) { return 1; }
 
+struct Func {
+  int func(int) { return 1; }
+};
+
 // for testing address_of
 class DiffRef {
 public:
@@ -181,10 +185,14 @@ TEST(test_types, result_of) {
   auto f = [](int a) -> int { return a + 1; };
   using type1 = result_of<decltype(f)(int)>::type;
   using type2 = result_of<decltype (&func)(int)>::type;
+  // TODO: result_of member function not support
+  using type3 = std::result_of<decltype (&Func::func)(Func, int)>::type;
   bool t1 = is_same<type1, int>::value;
   bool t2 = is_same<type2, int>::value;
+  bool t3 = is_same<type3, int>::value;
   EXPECT_TRUE(t1);
   EXPECT_TRUE(t2);
+  EXPECT_TRUE(t3);
 }
 
 TEST(test_types, address_of) {
