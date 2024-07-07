@@ -26,13 +26,14 @@ template <class AllocatorImpl, typename T> constexpr bool AllocatorInterface() {
          sqrl::is_same_v<deallocateRT, void>;
 }
 
-static_assert(AllocatorInterface<GenericAllocator, word_t>());
+// compile time check Allocator implementation satisfy AllocatorInterface
 static_assert(AllocatorInterface<ObjectAllocator<int>, int>());
+static_assert(AllocatorInterface<GenericAllocator, word_t>());
 
 #elif __cplusplus >= 202002L
 
 // allocator interface for C++20
-template <typename T, typename Impl>
+template <typename Impl, typename T>
 concept AllocatorInterface = requires(Impl impl, T *tp) {
   { impl.allocate(size_t{}) }
   ->std::same_as<T *>;
@@ -41,8 +42,8 @@ concept AllocatorInterface = requires(Impl impl, T *tp) {
 };
 
 // compile time check Allocator implementation satisfy AllocatorInterface
-static_assert(AllocatorInterface<int, ObjectAllocator<int>>);
-static_assert(AllocatorInterface<word_t, GenericAllocator>);
+static_assert(AllocatorInterface<ObjectAllocator<int>, int>);
+static_assert(AllocatorInterface<GenericAllocator, word_t>);
 
 #endif
 
