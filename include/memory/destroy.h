@@ -1,7 +1,7 @@
 #ifndef INCLUDED_MEMORY_DESTROY_H
 #define INCLUDED_MEMORY_DESTROY_H
 
-#include <memory/block.h>
+#include <memory/_block.h>
 
 namespace sqrl {
 

@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <memory/_allocator_impl.h>
-#include <memory/block.h>
 #include <string/string.h>
 
 using namespace sqrl;

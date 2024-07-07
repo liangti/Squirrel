@@ -1,7 +1,7 @@
 #ifndef INCLUDED_RECLAIMER_H
 #define INCLUDED_RECLAIMER_H
 
-#include <memory/block.h>
+#include <memory/_block.h>
 
 namespace sqrl {
 

@@ -7,7 +7,7 @@ Not suppose to use directlly
 */
 
 #include <map>
-#include <memory/block.h>
+#include <memory/_block.h>
 
 // From M_MMAP_THRESHOLD from glibc
 #define SQRL_ALLOCATOR_MMAP_THRESHOLD 131072

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <memory/block.h>
+#include <memory/_block.h>
 
 #define SQRL_ALLOCATOR_MMAP_THRESHOLD 131072
 

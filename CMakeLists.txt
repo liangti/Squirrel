@@ -2,14 +2,15 @@ cmake_minimum_required(VERSION 3.6)
 
 project(Squirrel C CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD "$ENV{CMAKE_CXX_STANDARD}")
+set(CMAKE_BUILD_TYPE "$ENV{CMAKE_BUILD_TYPE}")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(
     squirrel
     src/compiler/types.cpp
     src/compiler/vtable.cpp
-    src/memory/block.c
+    src/memory/_block.c
     src/memory/reclaimer.cpp
     src/memory/allocator.cpp
     src/memory/_allocator_impl.cpp

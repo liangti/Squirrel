@@ -3,7 +3,7 @@
 #include <sys/mman.h>
 
 
-#include <memory/block.h>
+#include <memory/_block.h>
 
 bool used(block_t *block) { return block->_size & 1; }
 
