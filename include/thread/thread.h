@@ -8,7 +8,9 @@
 
 namespace sqrl {
 
-class Thread {
+namespace details {
+
+template <bool AutoJoin> class ThreadImpl {
 private:
   pthread_t worker;
   bool created;
@@ -16,7 +18,7 @@ private:
 
 public:
   template <typename Callable, typename... Args>
-  explicit Thread(Callable &&fp, Args &&...args) noexcept
+  explicit ThreadImpl(Callable &&fp, Args &&...args) noexcept
       : worker(), joined(false) {
     typedef sqrl::Tuple<Callable, Args...> fp_pack_t;
 
@@ -59,8 +61,19 @@ public:
     }
   }
 
-  ~Thread() { join(); }
+  bool joinable() { return !joined; };
+
+  ~ThreadImpl() {
+    if constexpr (AutoJoin) {
+      join();
+    }
+  }
 };
+
+}; // namespace details
+
+using Thread = details::ThreadImpl<false>;
+using JThread = details::ThreadImpl<true>;
 
 }; // namespace sqrl
 
